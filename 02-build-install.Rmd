@@ -1,0 +1,66 @@
+# Building and installation {#build}
+
+The two shipped components install independently: the **firmware** has to be compiled and flashed onto each device, and the **GUI** is installed once on the machine you want to drive the devices from. You do not need the firmware toolchain to run the GUI, or vice versa.
+
+## Firmware {#build-firmware}
+
+### Requirements {-}
+
+* **ESP-IDF**, version 4.1 or newer, set up per the [Espressif getting-started guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html)
+* A target board based on the **ESP32-S3** (developed against the Seeed Studio XIAO Sense ESP32S3)
+* A USB cable and, on Linux, permission to access the serial port (typically membership of the `dialout` group)
+
+Third-party components are pulled automatically by the IDF Component Manager from `main/idf_component.yml`: `espressif/esp32-camera`, `espressif/mdns` and `hayschan/autopid_for_esp_idf`. A modified OV5640 autofocus driver is vendored in `components/`.
+
+### Build and flash {-}
+
+With the ESP-IDF environment activated:
+
+```bash
+git clone https://github.com/DWARPHs/DWARPH-firmware.git
+cd DWARPH-firmware
+
+idf.py set-target esp32s3
+idf.py build
+idf.py -p <PORT> flash monitor
+```
+
+`<PORT>` is the device's serial port --- `/dev/ttyACM0` or `/dev/ttyUSB0` on Linux, `COM3` or similar on Windows. Leave `monitor` off if you do not want to attach to the serial console; `Ctrl+]` exits it.
+
+### Configuration {-}
+
+WiFi credentials and the image capture interval are read from the device's `schedule.json` (see Section \@ref(schedules)), not compiled in, so the same binary can be flashed to every device in a fleet. Note that some settings still live in headers under `main/`, and are being migrated to the configuration file.
+
+Once a device is running, subsequent updates can be pushed over the network through the `/api/firmware/upload` endpoint instead of over USB.
+
+## GUI {#build-gui}
+
+### Requirements {-}
+
+* **Python 3** with Tk support (on some Linux distributions Tk is a separate package, e.g. `python-tk` or `python3-tk`)
+* The packages pinned in `requirements.txt`: `zeroconf`, `Pillow`, `opencv-python`, `matplotlib`, `paho-mqtt`, `pyserial` and `esp-idf-monitor`
+
+### Install and run {-}
+
+```bash
+git clone https://github.com/DWARPHs/DWARPH-GUI.git
+cd DWARPH-GUI
+
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .\.venv\Scripts\activate
+pip install -r requirements.txt
+
+python app.py
+```
+
+On Windows, `run_app.bat` does the equivalent in one step.
+
+The GUI needs to be on the **same local network** as the devices, and mDNS traffic must not be blocked between them --- this is the usual reason a device that is plainly powered up never appears in the grid. Discovery starts automatically in the background when the app launches.
+
+If you have no hardware to hand, the `Mock Device` toggle shows a fixed demo card so you can explore the interface.
+
+## MQTT broker {#build-broker}
+
+MQTT is **optional**. Without it, devices are still fully controllable over REST; what you lose is the once-per-second live update on the device cards.
+
+To enable it, run an MQTT broker reachable by both the devices and the GUI --- [Mosquitto](https://mosquitto.org/) is the usual choice, and the GUI repository ships a `mosquitto.conf` to start from --- then add the broker fields to each device's schedule as described in Section \@ref(mqtt).

@@ -1,0 +1,43 @@
+---
+title: "DWARPH: an open platform for automated duckweed phenotyping"
+author: "The DWARPH contributors"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+biblio-style: apalike
+link-citations: yes
+github-repo: DWARPHs/DWARPHs.github.io
+description: "Documentation for DWARPH, the Duckweed Automatic Robot for PHenotyping: a modular, open-source system for environmental control and image-based plant phenotyping."
+---
+
+```{r, echo=FALSE}
+source('./global_variables.R')
+```
+
+*This is the reference documentation for the DWARPH platform.
+It describes what the system does, the parts it is made of, how to build and install them, and how to run an experiment.*
+
+# What is DWARPH? {#intro}
+
+**DWARPH** stands for **Duckweed Automatic Robot for PHenotyping**.
+It is a small, self-contained growth chamber controller that automates and monitors a plant growth environment, built in the first instance around the aquatic plant *duckweed* (Lemnaceae).
+
+A DWARPH device does three things at once:
+
+* **It controls the environment.** Temperature is regulated against a setpoint by a heating ring driven by a PID controller, and illumination is set independently on red, blue and white channels.
+* **It watches the plants.** An on-board camera takes time-lapse images at a fixed interval, storing them on an SD card together with sensor logs.
+* **It follows a schedule.** Rather than holding one fixed condition, a device runs a user-written **schedule**: a list of timed setpoints that it interpolates between, so temperature and light can follow a daily cycle, and that cycle can be repeated for a set number of days.
+
+The hardware is built on an **ESP32-S3** microcontroller (developed against the Seeed Studio XIAO Sense ESP32S3), which keeps a single unit cheap enough to build many of them.
+That matters, because phenotyping experiments need replication: the platform is designed so that a lab can run a *fleet* of devices rather than a single instrument.
+
+To make a fleet manageable, every device announces itself on the local network over **mDNS/ZeroConf**, publishes live telemetry over **MQTT**, and exposes a **REST API** for configuration, image retrieval and firmware updates.
+A desktop application discovers whatever devices are on the network and presents them as a live grid of cards, so an experiment running on a dozen chambers can be watched and reconfigured from one screen.
+
+DWARPH is an open-source academic resource.
+The source for every part of the platform lives in the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`), and the chapters that follow map onto those repositories.
+
+<!-- TODO: replace with a real photograph or schematic of a DWARPH device, e.g. assets/device_overview.png -->
+
+> **This documentation is a work in progress.**
+> The platform is under active development, and the machine learning and manuscript components described in Chapter \@ref(modules) do not exist yet.
+> Sections marked *planned* describe intent, not shipped code.

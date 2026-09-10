@@ -1,0 +1,160 @@
+# User manual {#manual}
+
+This chapter covers running an actual experiment: writing the schedule that defines it, getting that schedule onto a device, and monitoring the device while it runs.
+
+## Schedules {#schedules}
+
+A schedule is the experiment. It is a single JSON file that tells a device what temperature and light to hold, how those change through the day, how long to keep repeating, and how often to take a picture.
+
+The device holds a list of **setpoints**, each pinned to a time, and interpolates between them, so a handful of points describes a smooth daily cycle rather than a series of steps.
+
+```json
+{
+  "scheduleConfig": {
+    "deviceID": "XYZABC",
+    "scheduleName": "Test",
+    "interpolation": "linear",
+    "timeType": "relative",
+    "timeUnit": "hours",
+    "startTime": 0,
+    "wifiSSID": "YourWiFiName",
+    "wifiPassword": "YourWiFiPassword",
+    "imageIntervalMin": 1,
+    "loopTime": 24,
+    "totalLoops": 7,
+    "focusMode": "Auto",
+    "schedule": [
+      {
+        "name": "Morning",
+        "description": "morning setpoint",
+        "time": 6,
+        "temperature": 16.0,
+        "light": { "red": 0.1, "blue": 0.0, "white": 0.1 }
+      },
+      {
+        "name": "Noon",
+        "description": "Noon setpoint",
+        "time": 12,
+        "temperature": 25.0,
+        "light": { "red": 1.0, "blue": 0.5, "white": 0.2 }
+      },
+      {
+        "name": "Night",
+        "description": "Night setpoint",
+        "time": 20,
+        "temperature": 10.0,
+        "light": { "red": 0.0, "blue": 0.0, "white": 0.1 }
+      }
+    ]
+  }
+}
+```
+
+### Configuration fields {-}
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Meaning,
+  "deviceID", "Identifier for this device. Also names the SD-card folder its data is written to, and the MQTT topic it publishes on.",
+  "scheduleName", "Free-text label for the experiment.",
+  "interpolation", "How values between two setpoints are computed, e.g. `linear`.",
+  "timeType", "`relative` counts from device start; absolute times are given as `YYYY_MM_DD HH_mm_SS`.",
+  "timeUnit", "Unit for `time` and `startTime` when `timeType` is relative, e.g. `hours`.",
+  "startTime", "Offset at which the schedule begins.",
+  "wifiSSID / wifiPassword", "Network the device joins on boot.",
+  "imageIntervalMin", "Minutes between time-lapse captures.",
+  "loopTime", "Length of one cycle before the schedule repeats, e.g. 24 for a daily cycle.",
+  "totalLoops", "How many times the cycle repeats, e.g. 7 for a week.",
+  "focusMode", "Camera focus mode, set once for the whole schedule and applied to every capture."
+)
+knitr::kable(df)
+```
+
+### Setpoint fields {-}
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Meaning,
+  "name / description", "Labels for the setpoint; not interpreted by the firmware.",
+  "time", "When this setpoint applies, in `timeUnit` (or as an absolute timestamp).",
+  "temperature", "Target temperature in °C. **Clamped to 10--50 °C by the firmware** for safety.",
+  "light", "Intensity of the `red`, `blue` and `white` channels, each from 0.0 to 1.0."
+)
+knitr::kable(df)
+```
+
+A practical note on the example above: two setpoints with the *same* `time` value cannot both be honoured, so give each one a distinct time unless you deliberately want a step change and understand how your interpolation mode handles it.
+
+### Installing a schedule {-}
+
+The file belongs in the device's own folder on the SD card, as `/sdcard/<DEVICE_ID>/schedule.json`. You can either write it to the card directly, or --- more conveniently --- use **Upload Schedule** in the GUI's Actions tab, which places it correctly for you. After uploading, use the scheduler controls to restart the run so the new file takes effect.
+
+## Running and monitoring devices {#running}
+
+Power a device up and it will join the configured WiFi network, sync its clock, begin executing its schedule and start capturing images. The OLED display shows status and sensor readings locally. None of this requires the GUI to be running: the device is autonomous, and the dashboard is a window onto it.
+
+Launch the GUI and discovery starts on its own. Devices appear as cards in a grid, which you can filter by keyword (default `dwarph`). Each card shows:
+
+* Device ID
+* Current temperature, setpoint, light, network, uptime and scheduler state --- driven by the MQTT fast stream
+* The latest thumbnail, fetched over REST
+* An `Open` button leading to the full per-device tools
+
+Clicking the thumbnail opens a fullscreen preview (`Esc` closes it).
+
+The per-device detail window adds:
+
+* **Stream** --- live MJPEG playback from `/api/stream`, with a `Record` control that writes the stream to a video file
+* **Actions** --- upload a schedule, start/stop/reset the scheduler, restart the device, manage SD card files
+* **API client** --- issue REST calls directly, useful when you want something the UI does not expose
+* **Debug** --- a rolling runtime log viewer
+
+## REST API {#rest-api}
+
+Every device serves an HTTP API. The GUI is built on it, and anything the GUI can do you can also script.
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Group, ~Endpoints,
+  "Identity and health", "`/api/hello`, `/api/id`, `/api/metadata`, `/api/error`, `/api/restart`",
+  "Scheduler", "`/api/schedule/start`, `/api/schedule/stop`, `/api/schedule/reset`",
+  "Sensors and actuators", "`/api/temps`, `/api/light/state`, `/api/oled/state`",
+  "Imaging", "`/api/image`, `/api/image/latest`, `/api/stream`",
+  "SD card", "`/api/sdcard/files`, `/api/sdcard/index`, `/api/sdcard/space`, `/api/sdcard/upload`, `/api/sdcard/delete`",
+  "Maintenance", "`/api/firmware/upload`, `/api/mqtt`"
+)
+knitr::kable(df)
+```
+
+`GET /api/mqtt` is the discovery hook: it returns the broker and topic strings for that device, so a client can subscribe without having the topic layout hard-coded.
+
+<!-- TODO: document request/response payloads for each endpoint. -->
+
+## MQTT telemetry {#mqtt}
+
+MQTT is enabled per device, through optional fields in `scheduleConfig`:
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Meaning,
+  "mqttBrokerUri", "Broker address, e.g. `mqtt://192.168.1.50:1883`",
+  "mqttUsername", "Optional",
+  "mqttPassword", "Optional",
+  "mqttTopicPrefix", "Optional; defaults to `dwraph/v1/devices`"
+)
+knitr::kable(df)
+```
+
+Each device then publishes on:
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Topic, ~Contents,
+  "`<prefix>/<deviceID>/fast`", "State update published every second: temperature, setpoint, heater output",
+  "`<prefix>/<deviceID>/status`", "`online`/`offline`, retained",
+  "`<prefix>/<deviceID>/meta`", "Topic metadata, retained"
+)
+knitr::kable(df)
+```
+
+Note the default prefix is spelled `dwraph`, not `dwarph`. This is a typo in the current firmware and GUI, and both sides agree on it, so subscriptions work --- but it will trip you up when writing your own client or grepping for topics. Set `mqttTopicPrefix` explicitly if you would rather not inherit it.

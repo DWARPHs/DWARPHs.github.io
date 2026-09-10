@@ -1,0 +1,15 @@
+bookdown::gitbook:
+  css: css/my_style.css
+  config:
+    toc:
+      collapse: section
+      before: |
+        <li><a href="./"><b>DWARPH</b> documentation</a></li>
+      after: |
+        <li>
+        <a href="https://github.com/DWARPHs" target="blank">DWARPHs on GitHub</a>
+        <a href="https://bookdown.org/yihui/bookdown/" target="blank">Published with bookdown</a>
+        </li>
+    edit: https://github.com/DWARPHs/DWARPHs.github.io/edit/main/%s
+  includes:
+    in_header: header.html

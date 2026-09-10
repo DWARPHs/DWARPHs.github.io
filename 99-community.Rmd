@@ -1,0 +1,34 @@
+# Issues and community {#community}
+
+## Citation {-}
+
+DWARPH is a research tool, and is --- and will remain --- as free and open-source as possible.
+
+<!-- TODO: replace with the DWARPH reference publication and its DOI once published. -->
+*A reference publication is in preparation. Until it is out, please cite the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`) if you use the platform in your research.*
+
+## Having trouble {-}
+
+If something is broken or you are stuck, the best thing you can do is **open an issue on the GitHub repository of the relevant component**:
+
+* Firmware, hardware, scheduling, the REST API --- [DWARPH-firmware](https://github.com/DWARPHs/DWARPH-firmware/issues)
+* The desktop dashboard, discovery, MQTT --- [DWARPH-GUI](https://github.com/DWARPHs/DWARPH-GUI/issues)
+* This documentation --- [DWARPHs.github.io](https://github.com/DWARPHs/DWARPHs.github.io/issues)
+
+An issue is more useful than an email: it is searchable, and the next person with the same problem finds the answer.
+
+When reporting a device problem, it helps a great deal to include the firmware version, the device's `schedule.json` (with WiFi credentials removed), and the relevant part of the serial monitor or the GUI's `Debug` log.
+
+## Contributing {-}
+
+External contributions are welcome. There are several ways to help:
+
+* Requesting features and reporting bugs through the GitHub issue tracker
+* Sending pull requests to any of the existing repositories
+* Improving this documentation --- every page has an **Edit** link in the top bar that takes you straight to its source
+* Volunteering to maintain or develop a component
+
+## Authors and contacts {-}
+
+<!-- TODO: fill in the lab affiliation, the list of contributors, and a contact address. -->
+DWARPH is developed by the [DWARPHs](`r GITHUB_ORG_URL`) group, with contributions from the wider community.
