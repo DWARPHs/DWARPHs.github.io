@@ -36,7 +36,9 @@ A desktop application discovers whatever devices are on the network and presents
 DWARPH is an open-source academic resource.
 The source for every part of the platform lives in the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`), and the chapters that follow map onto those repositories.
 
-<!-- TODO: replace with a real photograph or schematic of a DWARPH device, e.g. assets/device_overview.png -->
+```{r intro-chamber, echo=FALSE, fig.cap="Inside a DWARPH chamber: duckweed on the water surface under the RGBW panel, with the camera looking down. *(placeholder image --- replace with a photograph)*"}
+knitr::include_graphics("assets/placeholder-chamber.svg")
+```
 
 > **This documentation is a work in progress.**
 > The platform is under active development, and the machine learning and manuscript components described in Chapter \@ref(modules) do not exist yet.

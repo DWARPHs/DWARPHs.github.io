@@ -1,0 +1,26 @@
+# Schedule builder {#schedule-builder}
+
+This page is a tool, not a description of one. Fill in the form and it writes the schedule file for you, checking as you go for the mistakes that cost people an experiment --- a temperature the hardware will refuse, a light level outside the allowed range, two setpoints at the same time, a device ID that will make the firmware reject the file.
+
+Everything happens in your browser. Nothing is uploaded anywhere, and the WiFi password you type stays on your machine.
+
+Start from one of the four presets and change the numbers, or build a cycle from scratch. The graph shows what the chamber will actually do, which is usually enough to catch a schedule that does not mean what you thought it meant.
+
+```{r, echo=FALSE, results='asis'}
+# Emit the tool as a raw HTML block so pandoc passes it through verbatim
+# rather than parsing the markup as markdown.
+cat("```{=html}", readLines("assets/schedule-builder.html"), "```", sep = "\n")
+```
+
+## What to do with the file {-}
+
+Save it as `schedule.json` and put it on the device's SD card, inside a folder named after the device: `<DEVICE_ID>/schedule.json`. If the device is already on the network, you can skip the card and use **Upload Schedule** in the dashboard's Actions tab instead.
+
+Uploading a schedule does not interrupt a run already in progress --- reset the scheduler from the Actions tab to pick up the new file.
+
+Two things the form deliberately allows, because they are sometimes what you want:
+
+* **A "Runs on: any device" schedule.** Convenient for a fleet running one treatment, but it also means the file will be accepted by any chamber you drop it on, including one running something else. Use a specific device ID when chambers differ.
+* **Setpoints that fall outside the cycle length.** These are flagged, not blocked, since you may be mid-edit --- but a setpoint after the end of the cycle is never reached.
+
+A note on the WiFi password: it is stored in the schedule file as plain text, and it travels with the file. Bear that in mind before committing a schedule to a public repository or emailing it around; if the network password is sensitive, use a dedicated network for the devices.

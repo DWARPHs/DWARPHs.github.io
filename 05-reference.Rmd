@@ -1,0 +1,118 @@
+# Technical reference {#reference}
+
+This chapter is the formal reference for the schedule file format and the two network interfaces a device exposes. Chapter \@ref(manual) covers the same ground in practical terms; if you are running an experiment rather than writing software against the platform, start there.
+
+## Schedule file format {#schedule-format}
+
+A schedule is a JSON document with a single `scheduleConfig` object, which carries the run-wide configuration and a `schedule` array of setpoints.
+
+### `scheduleConfig` fields {-}
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Required, ~Value,
+  "`deviceID`", "yes", "The device's MAC suffix (case-sensitive), or `\"all\"` (case-insensitive) to allow any device. A schedule whose `deviceID` matches neither is **rejected on load**. See Section \\@ref(device-id).",
+  "`scheduleName`", "yes", "Free-text label identifying the schedule.",
+  "`interpolation`", "yes", "`\"linear\"`, `\"step\"` (instant changes) or `\"cubic\"` (Hermite spline).",
+  "`timeType`", "yes", "`\"relative\"` (time since device start) or `\"absolute\"` (**UTC**, formatted `YYYY_MM_DD HH_mm_SS`).",
+  "`timeUnit`", "yes", "`\"hours\"`, `\"minutes\"` or `\"seconds\"`. Ignored for absolute time.",
+  "`startTime`", "relative only", "When the schedule starts, in `timeUnit`.",
+  "`wifiSSID`", "yes", "Network the device joins at boot.",
+  "`wifiPassword`", "yes", "Password for that network.",
+  "`imageIntervalMin`", "yes", "Minutes between captures; must be greater than 0.",
+  "`loopTime`", "relative only", "Length of one cycle, in `timeUnit`.",
+  "`totalLoops`", "yes", "Number of repeats; `-1` repeats forever. For absolute schedules, any value other than 1 causes the date part to be ignored and the schedule treated as a 24-hour loop.",
+  "`focusMode`", "no", "`\"Auto\"` (default) or `\"Manual\"`. Case-insensitive.",
+  "`focusValue`", "if manual", "Fixed focus position, integer 0 (far) to 255 (close).",
+  "`mqttBrokerUri`", "no", "Enables telemetry, e.g. `mqtt://192.168.1.50:1883`.",
+  "`mqttUsername`", "no", "Broker username.",
+  "`mqttPassword`", "no", "Broker password.",
+  "`mqttTopicPrefix`", "no", "Defaults to `dwraph/v1/devices` — see Section \\@ref(mqtt)."
+)
+knitr::kable(df)
+```
+
+### Setpoint fields {-}
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Value,
+  "`name`", "Label for the setpoint. Not interpreted by the firmware.",
+  "`description`", "Free-text description. Not interpreted by the firmware.",
+  "`time`", "When this setpoint applies, in `timeUnit`, or an absolute timestamp.",
+  "`temperature`", "Target in °C. **Clamped by the firmware to 10--50 °C.**",
+  "`light`", "Object with `red`, `blue` and `white`, each 0.0--1.0."
+)
+knitr::kable(df)
+```
+
+The file belongs at `/sdcard/<DEVICE_ID>/schedule.json` on the device's SD card.
+
+## Device identity {#identity}
+
+A device's ID is derived at boot from its factory MAC address: the last six hexadecimal digits, upper case. It is not configurable, and the `deviceID` field of a schedule is a match condition rather than an assignment.
+
+The ID propagates to:
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Where, ~Form,
+  "SD card", "`/sdcard/<DEVICE_ID>/`",
+  "mDNS hostname", "`dwarph-<DEVICE_ID>`",
+  "mDNS service instance", "`DWARPH <DEVICE_ID>`",
+  "MQTT topic root", "`<prefix>/<DEVICE_ID>`",
+  "REST", "`GET /api/id`"
+)
+knitr::kable(df)
+```
+
+## REST API {#rest-api}
+
+Every device serves an HTTP API. The GUI is built entirely on it, so anything the GUI can do can also be scripted.
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Group, ~Endpoints,
+  "Identity and health", "`/api/hello`, `/api/id`, `/api/metadata`, `/api/error`, `/api/restart`",
+  "Scheduler", "`/api/schedule/start`, `/api/schedule/stop`, `/api/schedule/reset`",
+  "Sensors and actuators", "`/api/temps`, `/api/light/state`, `/api/oled/state`",
+  "Imaging", "`/api/image`, `/api/image/latest`, `/api/stream`",
+  "SD card", "`/api/sdcard/files`, `/api/sdcard/index`, `/api/sdcard/space`, `/api/sdcard/upload`, `/api/sdcard/delete`",
+  "Maintenance", "`/api/firmware/upload`, `/api/mqtt`"
+)
+knitr::kable(df)
+```
+
+`GET /api/mqtt` is the discovery hook: it returns the broker address and topic strings for that device, so a client can subscribe without hard-coding the topic layout.
+
+`/api/firmware/upload` accepts a firmware image over the network, so devices can be updated without being taken apart.
+
+<!-- TODO: document request and response payloads for each endpoint. -->
+
+## MQTT telemetry {#mqtt}
+
+MQTT is optional. Without a broker configured, a device is still fully controllable over REST; what you lose is the once-per-second live update that drives the dashboard cards.
+
+It is enabled per device through the optional `mqtt*` fields in `scheduleConfig` (see Section \@ref(schedule-format)). Each device then publishes on:
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Topic, ~Retained, ~Contents,
+  "`<prefix>/<deviceID>/fast`", "no", "State published every second: temperature, setpoint, heater output, light channels, network status, SD usage and scheduler state",
+  "`<prefix>/<deviceID>/status`", "yes", "`online` / `offline`",
+  "`<prefix>/<deviceID>/meta`", "yes", "Topic metadata"
+)
+knitr::kable(df)
+```
+
+The MQTT client ID is `dwraph-<deviceID>`.
+
+Note that the default topic prefix is spelled **`dwraph`**, not `dwarph`. This is a typo in the current firmware, and the GUI matches it, so the two interoperate correctly --- but it will trip you up when writing your own client or grepping for topics. Set `mqttTopicPrefix` explicitly if you would rather not inherit it.
+
+<!-- TODO: fix the `dwraph` prefix in firmware and GUI together, with a migration note here. -->
+
+## Discovery {#discovery}
+
+Devices announce themselves over mDNS/ZeroConf. The GUI scans for services whose name contains `dwarph` (the filter keyword is configurable) and tracks them as they come and go, so devices appear and disappear from the grid as they are powered on and off.
+
+This is why the GUI has no "add device by address" field, and why nothing is discovered when the laptop and the devices are on different subnets, or on a network that blocks multicast.

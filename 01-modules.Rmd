@@ -17,6 +17,10 @@ knitr::kable(df)
 
 ## How the parts fit together {#architecture}
 
+```{r architecture, echo=FALSE, fig.cap="How the pieces connect. *(placeholder diagram)*"}
+knitr::include_graphics("assets/placeholder-schematic.svg")
+```
+
 A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the GUI. There is no central server and no cloud component; everything happens on the local network.
 
 * Each **device** boots, joins the WiFi network named in its schedule, and starts executing that schedule autonomously. It keeps running whether or not anyone is watching — images and logs accumulate on its SD card.

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="900" height="480" role="img" aria-label="Placeholder: How the pieces connect">
+  <rect width="900" height="480" fill="#f4f5f7"/>
+  <rect x="6" y="6" width="888" height="468" fill="none" stroke="#c3c8d0" stroke-width="2" stroke-dasharray="10 7" rx="8"/>
+  <g transform="translate(450 198)" fill="none" stroke="#a6adb8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-26" y="-16" width="52" height="38" rx="5"/>
+    <path d="M-10 -16 l5 -8 h10 l5 8"/>
+    <circle cx="0" cy="4" r="11"/>
+  </g>
+  <text x="450" y="286" font-family="system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#5a626e" text-anchor="middle">How the pieces connect</text>
+  <text x="450" y="310" font-family="system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" fill="#858d99" text-anchor="middle">Devices on the local network, mDNS discovery, MQTT telemetry, REST control, GUI.</text>
+  <text x="450" y="336" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#a6adb8" text-anchor="middle">placeholder &#183; replace with diagram &#183; 900&#215;480</text>
+</svg>
