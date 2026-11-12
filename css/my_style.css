@@ -19,4 +19,4 @@ pre code {
 
 /* logo next to the book title in the sidebar */
 .book .book-summary a.dwarph-brand { display: flex; align-items: center; gap: 8px; }
-.book .book-summary a.dwarph-brand img { width: 30px; height: 30px; flex: none; }
+.book .book-summary a.dwarph-brand img { width: 60px; height: 60px; flex: none; }
