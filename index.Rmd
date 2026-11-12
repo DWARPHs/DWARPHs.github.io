@@ -13,10 +13,14 @@ description: "Documentation for DWARPH, the Duckweed Automatic Robot for PHenoty
 source('./global_variables.R')
 ```
 
+# What is DWARPH? {#intro}
+
+```{r landing-video, echo=FALSE, out.width="100%", fig.alt="DWARPH devices, then one week of duckweed growth in device C4E408 with the segmentation mask and the proportion of the ring covered over time"}
+knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
+```
+
 *This is the reference documentation for the DWARPH platform.
 It describes what the system does, the parts it is made of, how to build and install them, and how to run an experiment.*
-
-# What is DWARPH? {#intro}
 
 **DWARPH** stands for **Duckweed Automatic Robot for PHenotyping**.
 It is a small, self-contained growth chamber controller that automates and monitors a plant growth environment, built in the first instance around the aquatic plant *duckweed* (Lemnaceae).
@@ -35,10 +39,6 @@ A desktop application discovers whatever devices are on the network and presents
 
 DWARPH is an open-source academic resource.
 The source for every part of the platform lives in the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`), and the chapters that follow map onto those repositories.
-
-```{r intro-chamber, echo=FALSE, fig.cap="Inside a DWARPH chamber: duckweed on the water surface under the RGBW panel, with the camera looking down. *(placeholder image --- replace with a photograph)*"}
-knitr::include_graphics("assets/placeholder-chamber.svg")
-```
 
 ```{r intro-timelapse, echo=FALSE, fig.cap="A week in one DWARPH device: one image per hour, 11 to 18 September 2026 (device `C4E408`, one clone of *Lemna* sp.)."}
 knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
