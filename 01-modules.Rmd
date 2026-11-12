@@ -65,11 +65,11 @@ The purpose of the imaging is quantitative: turning a time-lapse of a growth cha
 `DWARPH-CV` is a Python package (`dwarph_cv`) with a single command, `dwarph-cv`, that does this on the folders the Commander mirrors from the devices:
 
 * **Segmentation** (`dwarph-cv segment`) --- a U-Net with a ResNet34 encoder outputs a duckweed mask for every image, and the coverage (fraction of the image that is duckweed) in a table. It runs on whole 1920×1920 images, on a GPU or a CPU.
-* **Ring reference** (`dwarph-cv ring`) --- finds the red reference ring in each image and solves the camera pose, giving the camera's distance and tilt for each frame, so that areas can be corrected for them.
+* **Ring reference** (`dwarph-cv ring`, `dwarph-cv ring-coverage`) --- finds the red reference ring in each image and solves the camera pose, giving the camera's distance and tilt for each frame. The ring also bounds the growing area: coverage is reported as the proportion of the area inside the ring that duckweed covers, which does not depend on the camera's distance.
 * **Training** (`dwarph-cv train`, optional) --- leave-one-device-out training and evaluation, and training on all data for a release.
 * **Annotation** (`dwarph-cv annotate`, optional) --- an interactive SAM 2.1 tool to make ground-truth masks for whole time-lapse series: click on one frame, propagate through the following frames, correct where needed.
 
-```{r segmentation-timelapse, echo=FALSE, fig.cap="The released segmentation model on one week of device `C4E408`: the image (left), the model's mask (right) and the coverage over time (below), one frame per hour."}
+```{r segmentation-timelapse, echo=FALSE, fig.cap="The platform, then one week of device `C4E408` with the released segmentation model: the image (left), the model's mask with the inner edge of the reference ring in red (right), and the proportion of the ring covered by duckweed over time (below), one frame per hour. Made with `scripts/make_timelapse.py`."}
 knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
 ```
 

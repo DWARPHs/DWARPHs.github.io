@@ -22,7 +22,16 @@ format in the firmware, update the builder's validation rules to match.
 
 Figures under `assets/placeholder-*.svg` are placeholders awaiting real photographs,
 screenshots and diagrams. The time-lapses (`assets/duckweed_*_C4E408.webp`) are real data;
-the segmentation one is made with `tools/make_timelapse.py` in DWARPH-CV.
+the segmentation one is made with [`scripts/make_timelapse.py`](scripts/make_timelapse.py)
+(needs DWARPH-CV installed). To remake it, or swap the intro photos:
+
+```bash
+python scripts/make_timelapse.py \
+    --device-dir /data/Device_mirror/C4E408 --start 20260911_132116 --every-min 60 \
+    --intro assets/20260911_151949.jpg "A fleet of DWARPH devices" \
+    --intro assets/20260918_132436.jpg "Inside a device: duckweed growing in the reference ring" \
+    --out assets/duckweed_segmentation_C4E408.webp
+```
 
 Chapters are ordered by filename. `index.Rmd` carries the site metadata;
 `_output.yml` and `_bookdown.yml` hold the build configuration.
