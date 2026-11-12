@@ -17,3 +17,6 @@ pre code {
   white-space: inherit;
 }
 
+/* logo next to the book title in the sidebar */
+.book .book-summary a.dwarph-brand { display: flex; align-items: center; gap: 8px; }
+.book .book-summary a.dwarph-brand img { width: 30px; height: 30px; flex: none; }

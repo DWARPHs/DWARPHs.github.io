@@ -36,6 +36,9 @@ jobs:
       - name: Render book
         run: Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
 
+      - name: Copy icons (bookdown only copies files the pages link to)
+        run: mkdir -p _book/assets && cp -r assets/icons _book/assets/
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _book
