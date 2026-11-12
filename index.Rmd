@@ -22,27 +22,19 @@ knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
 *This is the reference documentation for the DWARPH platform.
 It describes what the system does, the parts it is made of, how to build and install them, and how to run an experiment.*
 
-**DWARPH** stands for **Duckweed Automatic Robot for PHenotyping**.
-It is a small, self-contained growth chamber controller that automates and monitors a plant growth environment, built in the first instance around the aquatic plant *duckweed* (Lemnaceae).
+**DWARPH** (Duckweed Automatic Robot for PHenotyping) is a small growth chamber that grows duckweed under the conditions you choose and photographs it automatically, so you can measure how it grows.
 
-A DWARPH device does three things at once:
+With DWARPH you can:
 
-* **It controls the environment.** Temperature is regulated against a setpoint by a heating ring driven by a PID controller, and illumination is set independently on red, blue and white channels.
-* **It watches the plants.** An on-board camera takes time-lapse images at a fixed interval, storing them on an SD card together with sensor logs.
-* **It follows a schedule.** Rather than holding one fixed condition, a device runs a user-written **schedule**: a list of timed setpoints that it interpolates between, so temperature and light can follow a daily cycle, and that cycle can be repeated for a set number of days.
+* **Set the conditions.** Choose the temperature and the colour and brightness of the light (red, blue and white), and let them change over the day --- warm days and cool nights, for example --- repeated for as many days as the experiment lasts.
+* **Record the plants without being there.** Each device takes a picture at the interval you choose, day and night, and notes the temperature and light with every picture.
+* **Run many chambers at once.** The devices are cheap enough to build several, so one experiment can be repeated in many chambers side by side.
+* **Watch and control them from one computer.** The DWARPH Commander app finds your devices by itself and shows each one's latest picture, temperature and light. From it you can send a device a new program, start or stop a run, and copy all the pictures to your computer.
+* **Measure growth.** DWARPH-CV turns the pictures into numbers: for every picture, how much of the growing area is covered by duckweed, as in the video above.
 
-The hardware is built on an **ESP32-S3** microcontroller (developed against the Seeed Studio XIAO Sense ESP32S3), which keeps a single unit cheap enough to build many of them.
-That matters, because phenotyping experiments need replication: the platform is designed so that a lab can run a *fleet* of devices rather than a single instrument.
+Once started, a device follows its program on its own, even when your computer is switched off.
 
-To make a fleet manageable, every device announces itself on the local network over **mDNS/ZeroConf**, publishes live telemetry over **MQTT**, and exposes a **REST API** for configuration, image retrieval and firmware updates.
-A desktop application discovers whatever devices are on the network and presents them as a live grid of cards, so an experiment running on a dozen chambers can be watched and reconfigured from one screen.
-
-DWARPH is an open-source academic resource.
-The source for every part of the platform lives in the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`), and the chapters that follow map onto those repositories.
-
-```{r intro-timelapse, echo=FALSE, fig.cap="A week in one DWARPH device: one image per hour, 11 to 18 September 2026 (device `C4E408`, one clone of *Lemna* sp.)."}
-knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
-```
+DWARPH is open source. The hardware designs, the device software, the desktop app and the analysis tools are all in the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`). The following chapters explain how to build the devices, install the software and run an experiment.
 
 > **This documentation is a work in progress.**
 > The platform is under active development, and the manuscript component described in Chapter \@ref(modules) does not exist yet.
