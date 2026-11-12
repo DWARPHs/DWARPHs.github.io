@@ -21,7 +21,8 @@ no dependencies and runs entirely in the reader's browser. If you change the sch
 format in the firmware, update the builder's validation rules to match.
 
 Figures under `assets/placeholder-*.svg` are placeholders awaiting real photographs,
-screenshots and diagrams.
+screenshots and diagrams. The time-lapses (`assets/duckweed_*_C4E408.webp`) are real data;
+the segmentation one is made with `tools/make_timelapse.py` in DWARPH-CV.
 
 Chapters are ordered by filename. `index.Rmd` carries the site metadata;
 `_output.yml` and `_bookdown.yml` hold the build configuration.

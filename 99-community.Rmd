@@ -12,12 +12,14 @@ DWARPH is a research tool, and is --- and will remain --- as free and open-sourc
 If something is broken or you are stuck, the best thing you can do is **open an issue on the GitHub repository of the relevant component**:
 
 * Firmware, hardware, scheduling, the REST API --- [DWARPH-firmware](https://github.com/DWARPHs/DWARPH-firmware/issues)
-* The desktop dashboard, discovery, MQTT --- [DWARPH-GUI](https://github.com/DWARPHs/DWARPH-GUI/issues)
+* The desktop dashboard, discovery, MQTT --- [DWARPH-commander](https://github.com/DWARPHs/DWARPH-commander/issues)
+* Image analysis, segmentation, the released model --- [DWARPH-CV](https://github.com/DWARPHs/DWARPH-CV/issues)
+* PCBs and printed parts --- [DWARPH-hardware](https://github.com/DWARPHs/DWARPH-hardware/issues)
 * This documentation --- [DWARPHs.github.io](https://github.com/DWARPHs/DWARPHs.github.io/issues)
 
 An issue is more useful than an email: it is searchable, and the next person with the same problem finds the answer.
 
-When reporting a device problem, it helps a great deal to include the firmware version, the device's `schedule.json` (with WiFi credentials removed), and the relevant part of the serial monitor or the GUI's `Debug` log.
+When reporting a device problem, it helps a great deal to include the firmware version, the device's `schedule.json` (with WiFi credentials removed), and the relevant part of the serial monitor or the Commander's `Debug` log.
 
 ## Contributing {-}
 

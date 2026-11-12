@@ -68,7 +68,7 @@ knitr::kable(df)
 
 ## REST API {#rest-api}
 
-Every device serves an HTTP API. The GUI is built entirely on it, so anything the GUI can do can also be scripted.
+Every device serves an HTTP API. The Commander is built entirely on it, so anything the Commander can do can also be scripted.
 
 ```{r, echo=FALSE}
 df <- tibble::tribble(
@@ -107,12 +107,12 @@ knitr::kable(df)
 
 The MQTT client ID is `dwraph-<deviceID>`.
 
-Note that the default topic prefix is spelled **`dwraph`**, not `dwarph`. This is a typo in the current firmware, and the GUI matches it, so the two interoperate correctly --- but it will trip you up when writing your own client or grepping for topics. Set `mqttTopicPrefix` explicitly if you would rather not inherit it.
+Note that the default topic prefix is spelled **`dwraph`**, not `dwarph`. This is a typo in the current firmware, and the Commander matches it, so the two interoperate correctly --- but it will trip you up when writing your own client or grepping for topics. Set `mqttTopicPrefix` explicitly if you would rather not inherit it.
 
-<!-- TODO: fix the `dwraph` prefix in firmware and GUI together, with a migration note here. -->
+<!-- TODO: fix the `dwraph` prefix in firmware and Commander together, with a migration note here. -->
 
 ## Discovery {#discovery}
 
-Devices announce themselves over mDNS/ZeroConf. The GUI scans for services whose name contains `dwarph` (the filter keyword is configurable) and tracks them as they come and go, so devices appear and disappear from the grid as they are powered on and off.
+Devices announce themselves over mDNS/ZeroConf. The Commander scans for services whose name contains `dwarph` (the filter keyword is configurable) and tracks them as they come and go, so devices appear and disappear from the grid as they are powered on and off.
 
-This is why the GUI has no "add device by address" field, and why nothing is discovered when the laptop and the devices are on different subnets, or on a network that blocks multicast.
+This is why the Commander has no "add device by address" field, and why nothing is discovered when the laptop and the devices are on different subnets, or on a network that blocks multicast.

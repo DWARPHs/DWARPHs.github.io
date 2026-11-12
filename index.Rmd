@@ -40,6 +40,10 @@ The source for every part of the platform lives in the [DWARPHs GitHub organisat
 knitr::include_graphics("assets/placeholder-chamber.svg")
 ```
 
+```{r intro-timelapse, echo=FALSE, fig.cap="A week in one DWARPH device: one image per hour, 11 to 18 September 2026 (device `C4E408`, *Lemna gibba*)."}
+knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
+```
+
 > **This documentation is a work in progress.**
-> The platform is under active development, and the machine learning and manuscript components described in Chapter \@ref(modules) do not exist yet.
+> The platform is under active development, and the manuscript component described in Chapter \@ref(modules) does not exist yet.
 > Sections marked *planned* describe intent, not shipped code.

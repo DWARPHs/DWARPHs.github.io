@@ -1,6 +1,6 @@
 # Building and installation {#build}
 
-The two shipped components install independently: the **firmware** has to be compiled and flashed onto each device, and the **GUI** is installed once on the machine you want to drive the devices from. You do not need the firmware toolchain to run the GUI, or vice versa.
+The three software components install independently: the **firmware** has to be compiled and flashed onto each device, the **Commander** is installed once on the machine you want to drive the devices from, and **DWARPH-CV** goes on whichever machine analyses the images. You do not need the firmware toolchain to run the Commander, or vice versa.
 
 ## Firmware {#build-firmware}
 
@@ -33,7 +33,7 @@ WiFi credentials and the image capture interval are read from the device's `sche
 
 Once a device is running, subsequent updates can be pushed over the network through the `/api/firmware/upload` endpoint instead of over USB.
 
-## GUI {#build-gui}
+## Commander {#build-gui}
 
 ### Requirements {-}
 
@@ -43,8 +43,8 @@ Once a device is running, subsequent updates can be pushed over the network thro
 ### Install and run {-}
 
 ```bash
-git clone https://github.com/DWARPHs/DWARPH-GUI.git
-cd DWARPH-GUI
+git clone https://github.com/DWARPHs/DWARPH-commander.git
+cd DWARPH-commander
 
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .\.venv\Scripts\activate
@@ -55,12 +55,36 @@ python app.py
 
 On Windows, `run_app.bat` does the equivalent in one step.
 
-The GUI needs to be on the **same local network** as the devices, and mDNS traffic must not be blocked between them --- this is the usual reason a device that is plainly powered up never appears in the grid. Discovery starts automatically in the background when the app launches.
+The Commander needs to be on the **same local network** as the devices, and mDNS traffic must not be blocked between them --- this is the usual reason a device that is plainly powered up never appears in the grid. Discovery starts automatically in the background when the app launches.
 
 If you have no hardware to hand, the `Mock Device` toggle shows a fixed demo card so you can explore the interface.
+
+## DWARPH-CV {#build-cv}
+
+### Requirements {-}
+
+* **Python 3.10** or newer
+* **PyTorch**: a CUDA build if the machine has an NVIDIA GPU (see [pytorch.org](https://pytorch.org/get-started/locally/)); the CPU build works too, more slowly
+
+### Install and run {-}
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126   # or .../whl/cpu
+
+git clone https://github.com/DWARPHs/DWARPH-CV.git
+cd DWARPH-CV
+pip install -e .                 # segmentation and ring reference
+pip install -e '.[train]'        # optional: training
+pip install -e '.[annotate]'     # optional: SAM 2.1 annotator (NVIDIA GPU needed)
+
+dwarph-cv segment --input /path/to/Device_mirror/C4E408 --output preds   # masks + areas.csv
+dwarph-cv ring --root /path/to/Device_mirror/C4E408                       # camera distance and tilt
+```
+
+The first `segment` run downloads the released model from Zenodo and caches it in `~/.cache/dwarph_cv/`. Use `--weights path/to/model.pt` for your own model. `dwarph-cv --help` lists all commands.
 
 ## MQTT broker {#build-broker}
 
 MQTT is **optional**. Without it, devices are still fully controllable over REST; what you lose is the once-per-second live update on the device cards.
 
-To enable it, run an MQTT broker reachable by both the devices and the GUI --- [Mosquitto](https://mosquitto.org/) is the usual choice, and the GUI repository ships a `mosquitto.conf` to start from --- then add the broker fields to each device's schedule as described in Section \@ref(mqtt).
+To enable it, run an MQTT broker reachable by both the devices and the Commander --- [Mosquitto](https://mosquitto.org/) is the usual choice, and the Commander repository ships a `mosquitto.conf` to start from --- then add the broker fields to each device's schedule as described in Section \@ref(mqtt).

@@ -25,7 +25,7 @@ You will need:
 * One or more **assembled DWARPH devices** with firmware flashed (Chapter \@ref(build))
 * An **SD card** in each device
 * A **WiFi network** the devices can join, and a laptop on that same network
-* The **GUI** installed on that laptop (Chapter \@ref(build))
+* The **Commander** installed on that laptop (Chapter \@ref(build))
 
 One thing worth knowing before you design anything: **the device heats, but it does not actively cool.** It can hold a temperature above the room it sits in, and it reaches lower temperatures by simply not heating. In practice that means the coldest point in your schedule cannot go below the ambient temperature of the room, and a "night" of 10 °C is only achievable in a room that is already at or below 10 °C. Plan your room temperature around the *lowest* temperature your experiment needs.
 
@@ -42,12 +42,12 @@ This walkthrough runs a short, simple experiment end to end. Do it once before d
 3. **Set the WiFi details.** The device gets its network credentials *from the schedule file*, not from a settings menu. Fill in the network name and password in the builder. If you get these wrong the device will never appear on the network, and the only way to fix it is over USB or by editing the file on the SD card directly --- so check them carefully.
 
 4. **Get the schedule onto the device.** Two ways:
-   * *Over the network*, once the device is already on WiFi: in the GUI, open the device, go to the **Actions** tab, and use **Upload Schedule**.
+   * *Over the network*, once the device is already on WiFi: in the Commander, open the device, go to the **Actions** tab, and use **Upload Schedule**.
    * *Directly on the card*, which is how the first schedule usually gets there: put the SD card in your computer and save the file as `<DEVICE_ID>/schedule.json`. Section \@ref(device-id) explains what `<DEVICE_ID>` is and where to find it.
 
 5. **Power the device up.** It joins the WiFi network, sets its clock, and begins running the schedule. The small display on the device shows its status and current readings, so you can confirm it is alive without a computer.
 
-6. **Open the GUI.** Devices appear on their own within a few seconds --- you do not have to enter addresses or scan for anything. Each device becomes a card showing its ID, current temperature and setpoint, light levels, uptime, scheduler state, and the most recent photograph.
+6. **Open the Commander.** Devices appear on their own within a few seconds --- you do not have to enter addresses or scan for anything. Each device becomes a card showing its ID, current temperature and setpoint, light levels, uptime, scheduler state, and the most recent photograph.
 
 ```{r gui-grid, echo=FALSE, fig.cap="The dashboard. One card per device, updating live. *(placeholder screenshot)*"}
 knitr::include_graphics("assets/placeholder-gui-grid.svg")
@@ -147,7 +147,7 @@ Two things to watch with absolute time. It is interpreted as **UTC**, not your l
 
 ## Watching an experiment run {#running}
 
-Once started, a device is autonomous: it keeps running the schedule, recording images and logging measurements whether or not your laptop is on, whether or not the GUI is open, and whether or not the WiFi is working. The dashboard is a window onto the experiment, not a part of it.
+Once started, a device is autonomous: it keeps running the schedule, recording images and logging measurements whether or not your laptop is on, whether or not the Commander is open, and whether or not the WiFi is working. The dashboard is a window onto the experiment, not a part of it.
 
 Opening a device from its card gives you:
 
@@ -167,13 +167,15 @@ If you have no hardware to hand and just want to see how the interface works, tu
 
 ## Getting your data {#data}
 
-Images and logs are written to the **SD card**, in a folder named after the device ID. The card is the authoritative copy: the thumbnails in the GUI are for monitoring, not for analysis.
+Images and logs are written to the **SD card**, in a folder named after the device ID. The card is the authoritative copy: the thumbnails in the Commander are for monitoring, not for analysis.
 
-```{r timelapse, echo=FALSE, fig.cap="The output of a run: one frame per capture interval, over the whole experiment. *(placeholder image)*"}
-knitr::include_graphics("assets/placeholder-timelapse.svg")
+```{r timelapse, echo=FALSE, fig.cap="The output of a run: here one image per hour of a week-long run (device `C4E408`)."}
+knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
 ```
 
-At the end of a run, take the card out and copy the folder off it. You can also pull files over the network through the GUI, which is convenient for spot-checks mid-experiment but slower for an entire run.
+To measure the plants in these images, see DWARPH-CV (Section \@ref(ml-module)).
+
+At the end of a run, take the card out and copy the folder off it. You can also pull files over the network through the Commander, which is convenient for spot-checks mid-experiment but slower for an entire run.
 
 Keep the schedule file with the images. It is the record of what conditions the plants actually experienced, and in six months it will be the only thing that tells you what device `XYZABC` was doing.
 
@@ -184,7 +186,7 @@ Keep the schedule file with the images. It is the record of what conditions the 
 ```{r, echo=FALSE}
 df <- tibble::tribble(
   ~Symptom, ~"Most likely cause and fix",
-  "No devices appear in the GUI at all", "Your laptop and the devices are on different networks, or the network blocks device discovery (common on university and guest WiFi). Try a simple router or a phone hotspot to confirm. Discovery runs automatically — there is no button to press.",
+  "No devices appear in the Commander at all", "Your laptop and the devices are on different networks, or the network blocks device discovery (common on university and guest WiFi). Try a simple router or a phone hotspot to confirm. Discovery runs automatically — there is no button to press.",
   "One device is missing, the others are fine", "Wrong WiFi name or password in that device's schedule file. The device cannot tell you this over a network it never joined — check its display, or connect it by USB.",
   "A card appears but the readings never update", "The live readings come from the optional telemetry service. If it is not set up, the card will look static — the device is still running normally. See Section \\@ref(mqtt).",
   "Temperature never reaches the setpoint", "Most often the target is below room temperature: the device cannot cool. Otherwise check the heater and that the lid is closed.",

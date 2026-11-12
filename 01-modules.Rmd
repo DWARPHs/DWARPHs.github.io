@@ -7,8 +7,10 @@ The [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`) hosts the material (source
 df <- tibble::tribble(
   ~Name, ~Status, ~Description,
   "DWARPH-firmware", "available", "ESP-IDF firmware running on the ESP32-S3 device: scheduling, temperature and light control, camera, REST API and MQTT",
-  "DWARPH-GUI", "available", "Python desktop dashboard that discovers devices on the network and drives them",
-  "DWARPH-ml", "planned", "Machine learning for growth analysis and phenotype extraction from the time-lapse images",
+  "DWARPH-commander", "available", "Python desktop application (formerly DWARPH-GUI) that discovers devices on the network, drives them and mirrors their SD cards",
+  "DWARPH-CV", "available", "Python package for image analysis: duckweed segmentation (inference, training, annotation) and the ring reference for camera distance and tilt",
+  "DWARPH-hardware", "available", "PCBs, 3D-printed parts and the list of off-the-shelf parts",
+  "DWARPH-lightCalibration", "available", "Light measurements: light distribution and per-device PAR",
   "DWARPH-manuscript", "planned", "Manuscript material and experiments for the method publication",
   "DWARPHs.github.io", "available", "Source code of this documentation"
 )
@@ -21,12 +23,12 @@ knitr::kable(df)
 knitr::include_graphics("assets/placeholder-schematic.svg")
 ```
 
-A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the GUI. There is no central server and no cloud component; everything happens on the local network.
+A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the Commander. There is no central server and no cloud component; everything happens on the local network.
 
 * Each **device** boots, joins the WiFi network named in its schedule, and starts executing that schedule autonomously. It keeps running whether or not anyone is watching — images and logs accumulate on its SD card.
 * Each device **announces itself** over mDNS/ZeroConf, under a service name containing `dwarph`.
 * Each device **publishes telemetry** to an MQTT broker once per second, and **serves a REST API** over HTTP.
-* The **GUI** discovers devices by mDNS, subscribes to their MQTT topics for the live view, and uses REST for anything that needs a request/response exchange: fetching images, uploading a new schedule, starting and stopping the scheduler, streaming video, updating firmware.
+* The **Commander** discovers devices by mDNS, subscribes to their MQTT topics for the live view, and uses REST for anything that needs a request/response exchange: fetching images, uploading a new schedule, starting and stopping the scheduler, streaming video, updating firmware.
 
 The split matters in practice: MQTT carries the fast, lossy, broadcast-style state that a dashboard needs (temperature, setpoint, heater output), while REST carries the deliberate operations. A device with no broker configured still works fully over REST; MQTT is optional.
 
@@ -42,9 +44,9 @@ The split matters in practice: MQTT carries the fast, lossy, broadcast-style sta
 * **Storage and logging** (`main/sd_card.h`, `main/logger_task`) --- images and logs are written to an SD card, under a per-device folder named after the device ID.
 * **Supporting services** --- WiFi (`main/wifi_handler.h`), RTC and NTP time synchronisation (`main/RTC`, `main/time_functions.h`), an OLED status display (`main/96OLED4PINIIC.h`), and boot diagnostics.
 
-## The GUI {#gui}
+## The Commander {#gui}
 
-`DWARPH-GUI` is a Python/Tkinter application that turns a network of devices into a single dashboard.
+`DWARPH-commander` is a Python/Tkinter application that turns a network of devices into a single dashboard.
 
 * `discovery.py` --- ZeroConf discovery and device record tracking
 * `mqtt_service.py` --- MQTT connection, subscription and queueing
@@ -57,12 +59,26 @@ The split matters in practice: MQTT carries the fast, lossy, broadcast-style sta
 
 What it gives an operator is covered in Chapter \@ref(manual).
 
-## Machine learning {#ml-module}
+## Image analysis: DWARPH-CV {#ml-module}
 
-*Planned --- this repository does not exist yet.*
+The purpose of the imaging is quantitative: turning a time-lapse of a growth chamber into per-frame measurements of the duckweed population, and relating those to the conditions the device recorded alongside them.
+`DWARPH-CV` is a Python package (`dwarph_cv`) with a single command, `dwarph-cv`, that does this on the folders the Commander mirrors from the devices:
 
-The purpose of the imaging is ultimately quantitative: turning a time-lapse of a growth chamber into per-frame measurements of the duckweed population, such as covered area, frond count and growth rate, and relating those to the environmental conditions the device recorded alongside them.
-`DWARPH-ml` is intended to hold that analysis code and the trained models.
+* **Segmentation** (`dwarph-cv segment`) --- a U-Net with a ResNet34 encoder outputs a duckweed mask for every image, and the coverage (fraction of the image that is duckweed) in a table. It runs on whole 1920×1920 images, on a GPU or a CPU.
+* **Ring reference** (`dwarph-cv ring`) --- finds the red reference ring in each image and solves the camera pose, giving the camera's distance and tilt for each frame, so that areas can be corrected for them.
+* **Training** (`dwarph-cv train`, optional) --- leave-one-device-out training and evaluation, and training on all data for a release.
+* **Annotation** (`dwarph-cv annotate`, optional) --- an interactive SAM 2.1 tool to make ground-truth masks for whole time-lapse series: click on one frame, propagate through the following frames, correct where needed.
+
+```{r segmentation-timelapse, echo=FALSE, fig.cap="The released segmentation model on one week of device `C4E408`: the image (left), the model's mask (right) and the coverage over time (below), one frame per hour."}
+knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
+```
+
+The data and the model are published on Zenodo:
+
+* the **DWARPH duckweed segmentation dataset** v1.0: 13,581 images from 7 devices with their ground-truth masks and metadata, [doi:10.5281/zenodo.24164026](https://doi.org/10.5281/zenodo.24164026);
+* the **DWARPH segmentation weights** (`unet_r34_duckweed` v1.0), trained on all of that dataset, [doi:10.5281/zenodo.24164133](https://doi.org/10.5281/zenodo.24164133). Tested on a device it has not seen (leave-one-device-out), the same training reaches an IoU of 0.976 ± 0.007. `dwarph-cv segment` downloads the model on first use and checks its checksum; you can also give it your own weights file.
+
+Installation is described in Section \@ref(build-cv).
 
 ## Manuscript {#manuscript-module}
 
