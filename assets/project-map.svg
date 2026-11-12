@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 800" width="1400" height="800" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>How the DWARPH project fits together</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5b6470"/>
+    </marker>
+    <style>
+      .col { font-size: 15px; font-weight: 700; fill: #8a929c; letter-spacing: .08em; }
+      .box { fill: #ffffff; stroke: #3f8f29; stroke-width: 2.5; }
+      .data { fill: #eef4fb; stroke: #4a78a8; stroke-width: 2; }
+      .ext { fill: #f5effa; stroke: #7a5aa6; stroke-width: 2; }
+      .planned { fill: #ffffff; stroke: #9aa2ab; stroke-width: 2; stroke-dasharray: 7 5; }
+      .old { fill: #f3f4f5; stroke: #c3c8cd; stroke-width: 1.5; }
+      .t { font-size: 17px; font-weight: 700; fill: #1d2228; }
+      .s { font-size: 13.5px; fill: #4a525c; }
+      .m { font-size: 13px; fill: #4a525c; font-family: ui-monospace, 'DejaVu Sans Mono', monospace; }
+      .e { stroke: #5b6470; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .ed { stroke: #5b6470; stroke-width: 2; fill: none; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+      .l { font-size: 12.5px; fill: #5b6470; font-style: italic; }
+      .tag { font-size: 11.5px; font-weight: 700; }
+    </style>
+  </defs>
+  <rect width="1400" height="800" fill="#ffffff"/>
+
+  <!-- column headings -->
+  <text class="col" x="40" y="40">BUILD</text>
+  <text class="col" x="300" y="40">RUN</text>
+  <text class="col" x="575" y="40">COLLECT</text>
+  <text class="col" x="870" y="40">ANALYSE</text>
+  <text class="col" x="1150" y="40">SHARE</text>
+
+  <!-- BUILD -->
+  <rect class="box" x="40" y="70" width="210" height="110" rx="12"/>
+  <text class="t" x="56" y="98">DWARPH-hardware</text>
+  <text class="s" x="56" y="122">PCBs, 3D-printed parts,</text>
+  <text class="s" x="56" y="141">parts list</text>
+
+  <rect class="box" x="40" y="250" width="210" height="130" rx="12"/>
+  <text class="t" x="56" y="278">DWARPH-</text>
+  <text class="t" x="56" y="298">lightCalibration</text>
+  <text class="s" x="56" y="322">light uniformity in the</text>
+  <text class="s" x="56" y="341">chamber, PAR per device</text>
+
+  <!-- RUN -->
+  <rect class="box" x="300" y="70" width="220" height="310" rx="12"/>
+  <text class="t" x="316" y="98">DWARPH device</text>
+  <text class="s" x="316" y="120">running DWARPH-firmware</text>
+  <line x1="316" y1="134" x2="504" y2="134" stroke="#dfe3e7"/>
+  <text class="s" x="316" y="160">follows its schedule</text>
+  <text class="s" x="316" y="182">heats, lights (red, blue,</text>
+  <text class="s" x="316" y="200">white)</text>
+  <text class="s" x="316" y="224">takes a picture every</text>
+  <text class="s" x="316" y="242">few minutes</text>
+  <text class="s" x="316" y="266">writes pictures + their</text>
+  <text class="s" x="316" y="284">conditions to its SD card</text>
+  <text class="s" x="316" y="308">keeps running on its own</text>
+  <text class="m" x="316" y="348">schedule.json</text>
+
+  <!-- COLLECT -->
+  <rect class="box" x="575" y="70" width="240" height="150" rx="12"/>
+  <text class="t" x="591" y="98">DWARPH-commander</text>
+  <text class="s" x="591" y="120">desktop app for the fleet</text>
+  <line x1="591" y1="134" x2="799" y2="134" stroke="#dfe3e7"/>
+  <text class="s" x="591" y="158">finds devices, live view</text>
+  <text class="s" x="591" y="178">sends schedules, start/stop</text>
+  <text class="s" x="591" y="198">light calibration, updates</text>
+
+  <rect class="data" x="575" y="285" width="240" height="95" rx="12"/>
+  <text class="t" x="591" y="313">Device mirror</text>
+  <text class="s" x="591" y="335">copy of every SD card</text>
+  <text class="m" x="591" y="358">&lt;device&gt;/&lt;day&gt;/*.jpg+.json</text>
+
+  <rect class="planned" x="575" y="445" width="240" height="95" rx="12"/>
+  <text class="t" x="591" y="473">DWARPH_DB</text>
+  <text class="s" x="591" y="495">local catalogue and viewer</text>
+  <text class="s" x="591" y="514">not on GitHub yet</text>
+
+  <!-- ANALYSE -->
+  <rect class="box" x="870" y="70" width="230" height="470" rx="12"/>
+  <text class="t" x="886" y="98">DWARPH-CV</text>
+  <text class="s" x="886" y="120">Python package, dwarph-cv</text>
+  <line x1="886" y1="134" x2="1084" y2="134" stroke="#dfe3e7"/>
+  <text class="m" x="886" y="162">annotate</text>
+  <text class="s" x="886" y="181">SAM 2.1 → ground-truth masks</text>
+  <text class="m" x="886" y="215">train</text>
+  <text class="s" x="886" y="234">masks → model weights</text>
+  <text class="m" x="886" y="268">segment</text>
+  <text class="s" x="886" y="287">pictures → duckweed masks</text>
+  <text class="m" x="886" y="321">ring</text>
+  <text class="s" x="886" y="340">camera distance and tilt</text>
+  <text class="m" x="886" y="374">ring-coverage</text>
+  <text class="s" x="886" y="393">% of the ring covered</text>
+  <text class="s" x="886" y="412">= growth over time</text>
+  <line x1="886" y1="432" x2="1084" y2="432" stroke="#dfe3e7"/>
+  <text class="m" x="886" y="458">tools/build_dataset.py</text>
+  <text class="s" x="886" y="477">curated images + masks</text>
+  <text class="s" x="886" y="496">→ dataset zip</text>
+
+  <!-- SHARE -->
+  <rect class="ext" x="1150" y="70" width="215" height="95" rx="12"/>
+  <text class="tag" x="1166" y="92" fill="#7a5aa6">ZENODO</text>
+  <text class="t" x="1166" y="114">Model weights v1.0</text>
+  <text class="s" x="1166" y="135">unet_r34_duckweed</text>
+  <text class="m" x="1166" y="154">10.5281/zenodo.24164133</text>
+
+  <rect class="box" x="1150" y="200" width="215" height="95" rx="12"/>
+  <text class="t" x="1166" y="228">DWARPHs.github.io</text>
+  <text class="s" x="1166" y="250">documentation of every</text>
+  <text class="s" x="1166" y="269">part + figure scripts</text>
+
+  <rect class="ext" x="1150" y="330" width="215" height="95" rx="12"/>
+  <text class="tag" x="1166" y="352" fill="#7a5aa6">ZENODO</text>
+  <text class="t" x="1166" y="374">Dataset v1.0</text>
+  <text class="s" x="1166" y="395">13,581 images + masks</text>
+  <text class="m" x="1166" y="414">10.5281/zenodo.24164026</text>
+
+  <rect class="planned" x="1150" y="460" width="215" height="95" rx="12"/>
+  <text class="t" x="1166" y="488">DWARPH-manuscript</text>
+  <text class="s" x="1166" y="510">proposed: paper, analyses</text>
+  <text class="s" x="1166" y="529">and figures, reproducible</text>
+
+  <!-- edges -->
+  <path class="e" d="M250,125 L298,125"/>
+  <text class="l" x="256" y="116">build</text>
+  <path class="ed" d="M250,315 L298,315"/>
+  <text class="l" x="254" y="306">light</text>
+  <text class="l" x="254" y="337">settings</text>
+
+  <path class="e" d="M520,115 L573,115" marker-start="url(#arrow)"/>
+  <text class="l" x="524" y="104">Wi-Fi</text>
+  <path class="e" d="M520,332 L573,332"/>
+  <text class="l" x="526" y="322">SD card</text>
+  <path class="e" d="M695,220 L695,283"/>
+  <text class="l" x="703" y="256">mirrors</text>
+  <path class="e" d="M695,380 L695,443"/>
+  <text class="l" x="703" y="416">indexes</text>
+
+  <path class="e" d="M815,330 L868,330"/>
+  <text class="l" x="821" y="320">pictures</text>
+
+  <path class="e" d="M1100,225 C1124,225 1124,105 1148,105"/>
+  <text class="l" x="1104" y="216">train</text>
+  <path class="ed" d="M1148,145 L1102,145"/>
+  <text class="l" x="1104" y="137">download</text>
+  <path class="ed" d="M1100,385 C1124,385 1124,262 1148,262"/>
+  <text class="l" x="1104" y="318">figures</text>
+  <path class="e" d="M1100,470 C1124,470 1124,380 1148,380"/>
+  <text class="l" x="1104" y="490">upload</text>
+
+  <path class="ed" d="M1258,425 L1258,458"/>
+  <path class="ed" d="M1365,118 C1394,118 1394,507 1367,507"/>
+
+  <!-- legend and history -->
+  <rect class="old" x="40" y="610" width="760" height="64" rx="10"/>
+  <text class="s" x="56" y="636" font-weight="700">Merged into DWARPH-CV, to archive:</text>
+  <text class="s" x="56" y="657">DWARPH-segmentation, DWARPH-ringrefrence, DWARPH-annotation (history kept)</text>
+
+  <rect class="planned" x="870" y="610" width="495" height="64" rx="10"/>
+  <text class="s" x="886" y="636" font-weight="700">Planned: online hub</text>
+  <text class="s" x="886" y="657">Commanders sync to a server; shared dashboard and API</text>
+
+  <g transform="translate(40,712)">
+    <rect class="box" x="0" y="0" width="26" height="18" rx="4"/><text class="s" x="34" y="14">repository</text>
+    <rect class="data" x="140" y="0" width="26" height="18" rx="4"/><text class="s" x="174" y="14">data on disk</text>
+    <rect class="ext" x="290" y="0" width="26" height="18" rx="4"/><text class="s" x="324" y="14">published (DOI)</text>
+    <rect class="planned" x="460" y="0" width="26" height="18" rx="4"/><text class="s" x="494" y="14">planned / not on GitHub</text>
+    <path class="e" d="M680,9 L730,9"/><text class="s" x="738" y="14">data or files flow</text>
+    <path class="ed" d="M890,9 L940,9"/><text class="s" x="948" y="14">used by / informs</text>
+  </g>
+</svg>
