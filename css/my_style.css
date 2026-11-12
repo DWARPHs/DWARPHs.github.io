@@ -18,5 +18,5 @@ pre code {
 }
 
 /* logo next to the book title in the sidebar */
-.book .book-summary a.dwarph-brand { display: flex; align-items: center; gap: 8px; }
-.book .book-summary a.dwarph-brand img { width: 60px; height: 60px; flex: none; }
+.book .book-summary ul.summary li a.dwarph-brand { display: flex; align-items: center; gap: 10px; }
+.book .book-summary ul.summary li a.dwarph-brand img { width: 60px; height: 60px; flex: none; display: block; }
