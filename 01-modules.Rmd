@@ -8,7 +8,7 @@ The [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`) hosts the material (source
 <object data="assets/project-map.svg" type="image/svg+xml" style="width: 100%; max-width: 1400px;" aria-label="Project map">
 <img src="assets/project-map.svg" alt="How the parts of DWARPH fit together" style="width: 100%;">
 </object>
-<p class="caption">(\#fig:architecture) How the parts of DWARPH fit together, from building a device to publishing the data. Click a part to open its repository or its Zenodo record.</p>
+<p class="caption">(\#fig:architecture) How the parts of DWARPH fit together, in the order you use them: build a device, check it with DWARPH-QC (part of the firmware), operate it, analyse the pictures, share the results. Click a part to open its repository or its Zenodo record.</p>
 </div>
 
 ```{r, echo=FALSE}

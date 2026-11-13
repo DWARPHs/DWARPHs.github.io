@@ -31,7 +31,12 @@ STYLE = """
       .flow { stroke: #5b6470; stroke-width: 2; fill: none; marker-end: url(#arrow); }
       .uses { stroke: #5b6470; stroke-width: 2; fill: none; stroke-dasharray: 6 5; marker-end: url(#arrow); }
       .l { font-size: 12.5px; fill: #5b6470; font-style: italic; }
-      .tag { font-size: 11.5px; font-weight: 700; fill: #7a5aa6; }
+      .tag { font-size: 11.5px; font-weight: 700; fill: #7a5aa6; letter-spacing: .04em; }
+      .tag-repo { fill: #3f8f29; }
+      .tag-planned { fill: #6b7280; }
+      .phase { font-size: 15px; font-weight: 700; fill: #5b6470; letter-spacing: .08em; }
+      .phase-n { font-size: 13px; font-weight: 700; fill: #ffffff; }
+      .phase-arrow { stroke: #9aa2ab; stroke-width: 2; fill: none; marker-end: url(#arrow); }
       .rule { stroke: #dfe3e7; }
       a rect { transition: stroke-width .15s; }
       a:hover rect, a:focus rect { stroke-width: 4; }
@@ -62,7 +67,8 @@ def draw_node(node: dict) -> list[str]:
     out = [f'  <rect class="{kind}" x="{x}" y="{y}" width="{w}" height="{h}" rx="{12 if h > 70 else 10}"/>']
     tx, cursor, prev = x + 16, y, None
     if node.get("tag"):
-        out.append(f'  <text class="tag" x="{tx}" y="{y + 22}">{esc(node["tag"])}</text>')
+        tag_cls = "tag" if kind == "published" else f"tag tag-{kind}"
+        out.append(f'  <text class="{tag_cls}" x="{tx}" y="{y + 22}">{esc(node["tag"])}</text>')
         cursor, prev = y + 22, "tag"
     for item in node["items"]:
         (key, value), = item.items()
@@ -148,8 +154,20 @@ def draw(spec: dict) -> str:
            f"    <style>{STYLE}\n    </style>",
            "  </defs>",
            f'  <rect width="{W}" height="{H}" fill="#ffffff"/>']
-    for col in spec["columns"]:
-        out.append(f'  <text class="col" x="{col["x"]}" y="40">{esc(col["label"])}</text>')
+    cols = spec["columns"]
+    if spec.get("phases"):
+        # numbered phases in order, with an arrow from each heading to the next
+        for i, col in enumerate(cols, 1):
+            x = col["x"]
+            out.append(f'  <circle cx="{x + 11}" cy="35" r="11" fill="#5b6470"/>'
+                       f'<text class="phase-n" x="{x + 11}" y="40" text-anchor="middle">{i}</text>'
+                       f'<text class="phase" x="{x + 30}" y="40">{esc(col["label"])}</text>')
+            if i < len(cols):
+                start = x + 30 + 11 * len(col["label"]) + 14
+                out.append(f'  <path class="phase-arrow" d="M{start},35 L{cols[i]["x"] - 10},35"/>')
+    else:
+        for col in cols:
+            out.append(f'  <text class="col" x="{col["x"]}" y="40">{esc(col["label"])}</text>')
     for node in nodes.values():
         body = draw_node(node)
         if node.get("link"):

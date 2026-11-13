@@ -5,6 +5,8 @@
 #
 # kinds:   repo (green), data (blue, on disk), published (purple, has a DOI),
 #          planned (dashed: planned, or not on GitHub), old (grey: superseded, unused)
+# phases:  true = the columns are numbered steps, with arrows from one to the next
+# tag:     small capitals above the title (ZENODO, PART OF ...)
 # link:    optional URL: clicking the box opens it (new tab)
 # items:   {title: ...}  bold line      {text: ...}  normal line
 #          {code: ...}   monospace      {rule: true} separator      {space: N} extra space (px)
@@ -12,14 +14,16 @@
 #          style: flow (solid) or uses (dashed); both: true = arrow at both ends
 #          label: text, or [above, below] for two lines; label_at: [x, y] to place it by hand
 
-canvas: {width: 1400, height: 800}
+canvas: {width: 1660, height: 800}
 
+# The columns are the order of operations: build a device, QC it, operate it, analyse, share.
+phases: true
 columns:
   - {label: BUILD, x: 40}
-  - {label: RUN, x: 300}
-  - {label: COLLECT, x: 575}
-  - {label: ANALYSE, x: 870}
-  - {label: SHARE, x: 1150}
+  - {label: QC, x: 290}
+  - {label: OPERATE, x: 540}
+  - {label: ANALYSE, x: 1110}
+  - {label: SHARE, x: 1405}
 
 nodes:
   hardware:
@@ -31,23 +35,44 @@ nodes:
       - text: PCBs, 3D-printed parts,
       - text: parts list
 
+  firmware:
+    link: https://github.com/DWARPHs/DWARPH-firmware
+    kind: repo
+    box: [40, 215, 210, 165]
+    items:
+      - title: DWARPH-firmware
+      - text: "ESP32-S3: schedule,"
+      - text: heater, lights, camera,
+      - text: SD card, API
+      - rule: true
+      - text: includes DWARPH-QC
+      - code: tools/dwarph_qc
+
   qc:
     link: https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc
     kind: planned
-    box: [40, 250, 210, 130]
+    tag: PART OF DWARPH-FIRMWARE
+    box: [290, 70, 210, 310]
     items:
       - title: DWARPH-QC
-      - text: "planned, in DWARPH-firmware:"
-      - text: after flashing, a guided
-      - text: check over USB; a device
-      - text: runs only once QC'd
+      - text: after flashing, over USB
+      - rule: true
+      - text: clock, SD-card speed,
+      - text: sensors, heater,
+      - text: light ramps, schedule,
+      - text: camera under the
+      - text: capture light
+      - rule: true
+      - text: you confirm each step;
+      - text: then the device is
+      - text: marked QC'd
+
   device:
-    link: https://github.com/DWARPHs/DWARPH-firmware
     kind: repo
-    box: [300, 70, 220, 310]
+    box: [540, 70, 220, 310]
     items:
       - title: DWARPH device
-      - text: running DWARPH-firmware
+      - text: QC'd, running
       - rule: true
       - text: follows its schedule
       - text: heats, lights (red, blue,
@@ -66,7 +91,7 @@ nodes:
   commander:
     link: https://github.com/DWARPHs/DWARPH-commander
     kind: repo
-    box: [575, 70, 240, 150]
+    box: [800, 70, 240, 150]
     items:
       - title: DWARPH-commander
       - text: desktop app for the fleet
@@ -77,7 +102,7 @@ nodes:
 
   mirror:
     kind: data
-    box: [575, 285, 240, 95]
+    box: [800, 285, 240, 95]
     items:
       - title: Device mirror
       - text: copy of every SD card
@@ -85,7 +110,7 @@ nodes:
 
   db:
     kind: planned
-    box: [575, 445, 240, 95]
+    box: [800, 445, 240, 95]
     items:
       - title: DWARPH_DB
       - text: local catalogue and viewer
@@ -94,7 +119,7 @@ nodes:
   cv:
     link: https://github.com/DWARPHs/DWARPH-CV
     kind: repo
-    box: [870, 70, 230, 470]
+    box: [1110, 70, 230, 470]
     items:
       - title: DWARPH-CV
       - text: Python package, dwarph-cv
@@ -123,7 +148,7 @@ nodes:
     link: https://doi.org/10.5281/zenodo.24164133
     kind: published
     tag: ZENODO
-    box: [1150, 70, 215, 95]
+    box: [1405, 70, 215, 95]
     items:
       - title: Model weights v1.0
       - text: unet_r34_duckweed
@@ -132,7 +157,7 @@ nodes:
   docs:
     link: https://github.com/DWARPHs/DWARPHs.github.io
     kind: repo
-    box: [1150, 200, 215, 95]
+    box: [1405, 200, 215, 95]
     items:
       - title: DWARPHs.github.io
       - text: documentation of every
@@ -142,7 +167,7 @@ nodes:
     link: https://doi.org/10.5281/zenodo.24164026
     kind: published
     tag: ZENODO
-    box: [1150, 330, 215, 95]
+    box: [1405, 330, 215, 95]
     items:
       - title: Dataset v1.0
       - text: 13,581 images + masks
@@ -150,7 +175,7 @@ nodes:
 
   manuscript:
     kind: planned
-    box: [1150, 460, 215, 95]
+    box: [1405, 460, 215, 95]
     items:
       - title: DWARPH-manuscript
       - text: "proposed: paper, analyses"
@@ -158,14 +183,15 @@ nodes:
 
   hub:
     kind: planned
-    box: [575, 610, 525, 64]
+    box: [800, 610, 540, 64]
     items:
       - text: "**Planned: online hub**"
       - text: Commanders sync to a server; shared dashboard and API
 
 edges:
-  - {from: [hardware, right, 0.5], to: [device, left, 0.18], style: flow, label: build}
-  - {from: [qc, right, 0.5], to: [device, left, 0.79], style: uses, label: checks}
+  - {from: [hardware, right, 0.5], to: [qc, left, 0.18], style: flow, label: build}
+  - {from: [firmware, right, 0.5], to: [qc, left, 0.73], style: flow, label: flash}
+  - {from: [qc, right, 0.5], to: [device, left, 0.5], style: flow, label: QC'd}
   - {from: [device, right, 0.15], to: [commander, left, 0.3], style: flow, both: true, label: Wi-Fi}
   - {from: [device, right, 0.85], to: [mirror, left, 0.5], style: flow, label: SD card}
   - {from: [commander, bottom, 0.5], to: [mirror, top, 0.5], style: flow, label: mirrors}
@@ -173,7 +199,7 @@ edges:
   - {from: [mirror, right, 0.47], to: [cv, left, 0.55], style: flow, label: pictures}
   - {from: [cv, right, 0.33], to: [weights, left, 0.37], style: flow, label: train}
   - {from: [weights, left, 0.79], to: [cv, right, 0.16], style: uses, label: download}
-  - {from: [cv, right, 0.67], to: [docs, left, 0.65], style: uses, label: figures, label_at: [1104, 318]}
+  - {from: [cv, right, 0.67], to: [docs, left, 0.65], style: uses, label: figures, label_at: [1344, 318]}
   - {from: [cv, right, 0.85], to: [dataset, left, 0.53], style: flow, label: upload}
   - {from: [dataset, bottom, 0.5], to: [manuscript, top, 0.5], style: uses}
   - {from: [weights, right, 0.5], to: [manuscript, right, 0.5], style: uses}
