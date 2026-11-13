@@ -5,6 +5,7 @@
 #
 # kinds:   repo (green), data (blue, on disk), published (purple, has a DOI),
 #          planned (dashed: planned, or not on GitHub), old (grey: superseded, unused)
+# link:    optional URL: clicking the box opens it (new tab)
 # items:   {title: ...}  bold line      {text: ...}  normal line
 #          {code: ...}   monospace      {rule: true} separator      {space: N} extra space (px)
 # edges:   from/to: node id, side (left|right|top|bottom), position along that side (0-1)
@@ -22,6 +23,7 @@ columns:
 
 nodes:
   hardware:
+    link: https://github.com/DWARPHs/DWARPH-hardware
     kind: repo
     box: [40, 70, 210, 110]
     items:
@@ -30,6 +32,7 @@ nodes:
       - text: parts list
 
   lightcal:
+    link: https://github.com/DWARPHs/DWARPH-lightCalibration
     kind: repo
     box: [40, 250, 210, 130]
     items:
@@ -39,6 +42,7 @@ nodes:
       - text: chamber, PAR per device
 
   device:
+    link: https://github.com/DWARPHs/DWARPH-firmware
     kind: repo
     box: [300, 70, 220, 310]
     items:
@@ -60,6 +64,7 @@ nodes:
       - code: schedule.json
 
   commander:
+    link: https://github.com/DWARPHs/DWARPH-commander
     kind: repo
     box: [575, 70, 240, 150]
     items:
@@ -87,6 +92,7 @@ nodes:
       - text: not on GitHub yet
 
   cv:
+    link: https://github.com/DWARPHs/DWARPH-CV
     kind: repo
     box: [870, 70, 230, 470]
     items:
@@ -114,6 +120,7 @@ nodes:
       - text: → dataset zip
 
   weights:
+    link: https://doi.org/10.5281/zenodo.24164133
     kind: published
     tag: ZENODO
     box: [1150, 70, 215, 95]
@@ -123,6 +130,7 @@ nodes:
       - code: 10.5281/zenodo.24164133
 
   docs:
+    link: https://github.com/DWARPHs/DWARPHs.github.io
     kind: repo
     box: [1150, 200, 215, 95]
     items:
@@ -131,6 +139,7 @@ nodes:
       - text: part + figure scripts
 
   dataset:
+    link: https://doi.org/10.5281/zenodo.24164026
     kind: published
     tag: ZENODO
     box: [1150, 330, 215, 95]

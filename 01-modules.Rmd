@@ -19,9 +19,13 @@ knitr::kable(df)
 
 ## How the parts fit together {#architecture}
 
-```{r architecture, echo=FALSE, out.width="100%", fig.cap="How the parts of DWARPH fit together, from building a device to publishing the data."}
-knitr::include_graphics("assets/project-map.svg")
-```
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:architecture"></span>
+<object data="assets/project-map.svg" type="image/svg+xml" style="width: 100%; max-width: 1400px;" aria-label="Project map">
+<img src="assets/project-map.svg" alt="How the parts of DWARPH fit together" style="width: 100%;">
+</object>
+<p class="caption">(\#fig:architecture) How the parts of DWARPH fit together, from building a device to publishing the data. Click a part to open its repository or its Zenodo record.</p>
+</div>
 
 A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the Commander. There is no central server and no cloud component; everything happens on the local network.
 
