@@ -151,7 +151,7 @@ nodes:
     kind: old
     box: [40, 610, 760, 64]
     items:
-      - text: "**Merged into DWARPH-CV, to archive:**"
+      - text: "**Merged into DWARPH-CV, archived (read-only):**"
       - text: DWARPH-segmentation, DWARPH-ringrefrence, DWARPH-annotation (history kept)
 
   hub:
