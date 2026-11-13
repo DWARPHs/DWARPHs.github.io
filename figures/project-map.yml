@@ -1,0 +1,180 @@
+# How the DWARPH project fits together (Figure 2.1 of the documentation).
+#
+# This file is the description of the figure: the parts, what they contain, and how they
+# connect. `python scripts/make_project_map.py` draws assets/project-map.svg from it.
+#
+# kinds:   repo (green), data (blue, on disk), published (purple, has a DOI),
+#          planned (dashed: planned, or not on GitHub), old (grey: superseded)
+# items:   {title: ...}  bold line      {text: ...}  normal line
+#          {code: ...}   monospace      {rule: true} separator      {space: N} extra space (px)
+# edges:   from/to: node id, side (left|right|top|bottom), position along that side (0-1)
+#          style: flow (solid) or uses (dashed); both: true = arrow at both ends
+#          label: text, or [above, below] for two lines; label_at: [x, y] to place it by hand
+
+canvas: {width: 1400, height: 800}
+
+columns:
+  - {label: BUILD, x: 40}
+  - {label: RUN, x: 300}
+  - {label: COLLECT, x: 575}
+  - {label: ANALYSE, x: 870}
+  - {label: SHARE, x: 1150}
+
+nodes:
+  hardware:
+    kind: repo
+    box: [40, 70, 210, 110]
+    items:
+      - title: DWARPH-hardware
+      - text: PCBs, 3D-printed parts,
+      - text: parts list
+
+  lightcal:
+    kind: repo
+    box: [40, 250, 210, 130]
+    items:
+      - title: DWARPH-
+      - title: lightCalibration
+      - text: light uniformity in the
+      - text: chamber, PAR per device
+
+  device:
+    kind: repo
+    box: [300, 70, 220, 310]
+    items:
+      - title: DWARPH device
+      - text: running DWARPH-firmware
+      - rule: true
+      - text: follows its schedule
+      - text: heats, lights (red, blue,
+      - text: white)
+      - space: 5
+      - text: takes a picture every
+      - text: few minutes
+      - space: 5
+      - text: writes pictures + their
+      - text: conditions to its SD card
+      - space: 5
+      - text: keeps running on its own
+      - space: 22
+      - code: schedule.json
+
+  commander:
+    kind: repo
+    box: [575, 70, 240, 150]
+    items:
+      - title: DWARPH-commander
+      - text: desktop app for the fleet
+      - rule: true
+      - text: finds devices, live view
+      - text: sends schedules, start/stop
+      - text: light calibration, updates
+
+  mirror:
+    kind: data
+    box: [575, 285, 240, 95]
+    items:
+      - title: Device mirror
+      - text: copy of every SD card
+      - code: <device>/<day>/*.jpg+.json
+
+  db:
+    kind: planned
+    box: [575, 445, 240, 95]
+    items:
+      - title: DWARPH_DB
+      - text: local catalogue and viewer
+      - text: not on GitHub yet
+
+  cv:
+    kind: repo
+    box: [870, 70, 230, 470]
+    items:
+      - title: DWARPH-CV
+      - text: Python package, dwarph-cv
+      - rule: true
+      - code: annotate
+      - text: SAM 2.1 → ground-truth masks
+      - space: 12
+      - code: train
+      - text: masks → model weights
+      - space: 12
+      - code: segment
+      - text: pictures → duckweed masks
+      - space: 12
+      - code: ring
+      - text: camera distance and tilt
+      - space: 12
+      - code: ring-coverage
+      - text: "% of the ring covered"
+      - text: = growth over time
+      - rule: true
+      - code: tools/build_dataset.py
+      - text: curated images + masks
+      - text: → dataset zip
+
+  weights:
+    kind: published
+    tag: ZENODO
+    box: [1150, 70, 215, 95]
+    items:
+      - title: Model weights v1.0
+      - text: unet_r34_duckweed
+      - code: 10.5281/zenodo.24164133
+
+  docs:
+    kind: repo
+    box: [1150, 200, 215, 95]
+    items:
+      - title: DWARPHs.github.io
+      - text: documentation of every
+      - text: part + figure scripts
+
+  dataset:
+    kind: published
+    tag: ZENODO
+    box: [1150, 330, 215, 95]
+    items:
+      - title: Dataset v1.0
+      - text: 13,581 images + masks
+      - code: 10.5281/zenodo.24164026
+
+  manuscript:
+    kind: planned
+    box: [1150, 460, 215, 95]
+    items:
+      - title: DWARPH-manuscript
+      - text: "proposed: paper, analyses"
+      - text: and figures, reproducible
+
+  merged:
+    kind: old
+    box: [40, 610, 760, 64]
+    items:
+      - text: "**Merged into DWARPH-CV, to archive:**"
+      - text: DWARPH-segmentation, DWARPH-ringrefrence, DWARPH-annotation (history kept)
+
+  hub:
+    kind: planned
+    box: [870, 610, 495, 64]
+    items:
+      - text: "**Planned: online hub**"
+      - text: Commanders sync to a server; shared dashboard and API
+
+edges:
+  - {from: [hardware, right, 0.5], to: [device, left, 0.18], style: flow, label: build}
+  - {from: [lightcal, right, 0.5], to: [device, left, 0.79], style: uses, label: [light, settings]}
+  - {from: [device, right, 0.15], to: [commander, left, 0.3], style: flow, both: true, label: Wi-Fi}
+  - {from: [device, right, 0.85], to: [mirror, left, 0.5], style: flow, label: SD card}
+  - {from: [commander, bottom, 0.5], to: [mirror, top, 0.5], style: flow, label: mirrors}
+  - {from: [mirror, bottom, 0.5], to: [db, top, 0.5], style: flow, label: indexes}
+  - {from: [mirror, right, 0.47], to: [cv, left, 0.55], style: flow, label: pictures}
+  - {from: [cv, right, 0.33], to: [weights, left, 0.37], style: flow, label: train}
+  - {from: [weights, left, 0.79], to: [cv, right, 0.16], style: uses, label: download}
+  - {from: [cv, right, 0.67], to: [docs, left, 0.65], style: uses, label: figures, label_at: [1104, 318]}
+  - {from: [cv, right, 0.85], to: [dataset, left, 0.53], style: flow, label: upload}
+  - {from: [dataset, bottom, 0.5], to: [manuscript, top, 0.5], style: uses}
+  - {from: [weights, right, 0.5], to: [manuscript, right, 0.5], style: uses}
+
+legend:
+  at: [40, 712]

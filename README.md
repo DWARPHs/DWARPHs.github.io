@@ -33,6 +33,11 @@ python scripts/make_timelapse.py \
     --out assets/duckweed_segmentation_C4E408.webp
 ```
 
+The project map (Figure 2.1, `assets/project-map.svg`) is drawn from its description in
+[`figures/project-map.yml`](figures/project-map.yml): the parts, what they contain and how they
+connect. Edit the YAML, then run `python scripts/make_project_map.py` (needs PyYAML;
+`--png preview.png` also renders a preview). Don't edit the SVG by hand.
+
 Chapters are ordered by filename. `index.Rmd` carries the site metadata;
 `_output.yml` and `_bookdown.yml` hold the build configuration.
 
