@@ -15,13 +15,17 @@ are undistorted with the camera calibration; the right panel is the model's mask
 fitted inner edge of the ring in red. Coverage = duckweed area inside the ring / area inside
 the ring (``dwarph_cv.ring.ring_coverage``). If the ring is not found in a frame, the last
 ring found is used. The curve spans the whole series on a fixed axis and is revealed up to the
-frame being shown. Images are only read.
+frame being shown; grey bands are the program's night (all scheduled lights off), from the
+metadata of every image of the series, so the bands are exact to the capture interval. Each
+image shows the program's set temperature and light levels at that moment (``.json`` next to
+the image). Images are only read.
 """
 from __future__ import annotations
 
 import argparse
 import datetime as dt
 import io
+import json
 import re
 from pathlib import Path
 
@@ -42,6 +46,48 @@ TIME_RE = re.compile(r"(\d{8}_\d{6})")
 GREEN = np.array([110, 190, 70], np.uint8)
 BACKGROUND = np.array([18, 18, 18], np.uint8)
 RING = (230, 60, 60)
+
+
+def read_meta(image: Path) -> dict | None:
+    """The device's metadata of one image, or None if it is missing or unreadable."""
+    try:
+        return json.loads(image.with_suffix(".json").read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def setpoints(meta: dict | None) -> dict | None:
+    try:
+        light = meta["light"]["scheduled"]
+        return {"temp": float(meta["environment"]["temperature_setpoint"]),
+                "red": float(light["red"]), "blue": float(light["blue"]), "white": float(light["white"])}
+    except (TypeError, KeyError, ValueError):
+        return None
+
+
+def night_spans(device_dir: Path, t0: dt.datetime, t1: dt.datetime):
+    """(start, end) of the periods when the program had every light off."""
+    spans, start, last = [], None, None
+    for p in sorted(device_dir.glob("*/*.jpg")):
+        m = TIME_RE.match(p.name)
+        if not m:
+            continue
+        t = dt.datetime.strptime(m.group(1), "%Y%m%d_%H%M%S")
+        if not t0 <= t <= t1:
+            continue
+        sp = setpoints(read_meta(p))
+        if sp is None:
+            continue
+        dark = sp["red"] + sp["blue"] + sp["white"] <= 1e-6
+        if dark and start is None:
+            start = t
+        elif not dark and start is not None:
+            spans.append((start, t))
+            start = None
+        last = t
+    if start is not None:
+        spans.append((start, last))
+    return spans
 
 
 def pick_frames(device_dir: Path, start: dt.datetime, every: dt.timedelta,
@@ -89,9 +135,12 @@ def intro_frame(path: Path, caption: str, size: tuple[int, int]) -> Image.Image:
     return canvas
 
 
-def curve_frame(times, cover, k, width, height):
+def curve_frame(times, cover, k, width, height, nights=()):
     fig = plt.figure(figsize=(width / 100, height / 100), dpi=100)
     ax = fig.add_axes([0.08, 0.2, 0.89, 0.72])
+    ax.set_facecolor("white")
+    for a, b in nights:
+        ax.axvspan(a, b, color="#e4e6e9", lw=0, zorder=0)
     ax.plot(times[: k + 1], cover[: k + 1], color="#3f8f29", lw=2)
     ax.plot(times[k], cover[k], "o", color="#3f8f29", ms=7)
     ax.set_xlim(times[0], times[-1])
@@ -100,6 +149,9 @@ def curve_frame(times, cover, k, width, height):
     ax.xaxis.set_major_locator(mdates.DayLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
     ax.grid(alpha=0.3)
+    if nights:
+        ax.text(0.995, 1.02, "grey: night (lights off)", transform=ax.transAxes, ha="right", va="bottom",
+                fontsize=9, color="#6b7280")
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
     buf = io.BytesIO()
@@ -138,8 +190,9 @@ def main(argv=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model, ck = load_checkpoint(resolve_weights(a.weights), device)
     S = a.panel
-    panels, cover, rows, last_ring, n_carried = [], [], [], None, 0
+    panels, cover, rows, last_ring, n_carried, sets = [], [], [], None, 0, []
     for t, path in frames_in:
+        sets.append(setpoints(read_meta(path)))
         bgr = cv2.imread(str(path))
         rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
         mask = predict_prob(model, rgb, device) >= ck["threshold"]
@@ -163,6 +216,7 @@ def main(argv=None):
     if n_carried:
         print(f"ring not found in {n_carried} frames: the previous ring was used")
     times = [t for t, _ in frames_in]
+    nights = night_spans(device_dir, times[0], times[-1])
     if a.csv:
         a.csv.write_text("timestamp,image,ring_status,ring_coverage,image_coverage\n" + "".join(
             f"{t:%Y-%m-%d %H:%M:%S},{n},{s},{rc:.6f},{ic:.6f}\n" for t, n, s, rc, ic in rows))
@@ -176,9 +230,13 @@ def main(argv=None):
         canvas.paste(shown, (0, 0))
         canvas.paste(m, (S, 0))
         label(canvas, f"{t:%d %b  %H:%M}", (20, S - 38), f_big)
+        if sets[k] is not None:
+            sp = sets[k]
+            label(canvas, f"set {sp['temp']:.0f} °C   red {100 * sp['red']:.0f} %   blue {100 * sp['blue']:.0f} %"
+                          f"   white {100 * sp['white']:.0f} %", (20, S - 84), f_small)
         label(canvas, "image", (20, 16), f_small)
         label(canvas, f"model mask: {cover[k]:.0f} % of the ring", (S + 20, 16), f_small)
-        canvas.paste(curve_frame(times, cover, k, 2 * S, a.curve_height), (0, S))
+        canvas.paste(curve_frame(times, cover, k, 2 * S, a.curve_height, nights), (0, S))
         frames.append(canvas)
         durations.append(a.frame_ms)
     durations[-1] = 2000

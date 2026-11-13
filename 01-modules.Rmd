@@ -73,7 +73,7 @@ The purpose of the imaging is quantitative: turning a time-lapse of a growth cha
 * **Training** (`dwarph-cv train`, optional) --- leave-one-device-out training and evaluation, and training on all data for a release.
 * **Annotation** (`dwarph-cv annotate`, optional) --- an interactive SAM 2.1 tool to make ground-truth masks for whole time-lapse series: click on one frame, propagate through the following frames, correct where needed.
 
-```{r segmentation-timelapse, echo=FALSE, fig.cap="The platform, then one week of device `C4E408` with the released segmentation model: the image (left), the model's mask with the inner edge of the reference ring in red (right), and the proportion of the ring covered by duckweed over time (below), one frame per hour. Made with `scripts/make_timelapse.py`."}
+```{r segmentation-timelapse, echo=FALSE, fig.cap="The platform, then one week of device `C4E408` with the released segmentation model: the image (left), the model's mask with the inner edge of the reference ring in red (right), and the proportion of the ring covered by duckweed over time (below), one frame per hour. The image shows the program's set temperature and light levels; grey bands in the graph are the program's nights (all lights off), which follow the experiment's schedule rather than the clock. Made with `scripts/make_timelapse.py`."}
 knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
 ```
 
