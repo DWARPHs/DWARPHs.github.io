@@ -40,13 +40,14 @@
   <text class="s" x="56" y="120">PCBs, 3D-printed parts,</text>
   <text class="s" x="56" y="139">parts list</text>
   </a>
-  <a href="https://github.com/DWARPHs/DWARPH-lightCalibration" target="_blank" rel="noopener">
-  <title>DWARPH-: https://github.com/DWARPHs/DWARPH-lightCalibration</title>
-  <rect class="repo" x="40" y="250" width="210" height="130" rx="12"/>
-  <text class="t" x="56" y="278">DWARPH-</text>
-  <text class="t" x="56" y="298">lightCalibration</text>
-  <text class="s" x="56" y="320">light uniformity in the</text>
-  <text class="s" x="56" y="339">chamber, PAR per device</text>
+  <a href="https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc" target="_blank" rel="noopener">
+  <title>DWARPH-QC: https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc</title>
+  <rect class="planned" x="40" y="250" width="210" height="130" rx="12"/>
+  <text class="t" x="56" y="278">DWARPH-QC</text>
+  <text class="s" x="56" y="300">planned, in DWARPH-firmware:</text>
+  <text class="s" x="56" y="319">guided check that a</text>
+  <text class="s" x="56" y="338">device works, step by</text>
+  <text class="s" x="56" y="357">step, with a report</text>
   </a>
   <a href="https://github.com/DWARPHs/DWARPH-firmware" target="_blank" rel="noopener">
   <title>DWARPH device: https://github.com/DWARPHs/DWARPH-firmware</title>
@@ -137,8 +138,7 @@
   <path class="flow" d="M250,125 L298,125.8"/>
   <text class="l" x="254" y="116">build</text>
   <path class="uses" d="M250,315 L298,314.9"/>
-  <text class="l" x="254" y="306">light</text>
-  <text class="l" x="254" y="337">settings</text>
+  <text class="l" x="254" y="306">checks</text>
   <path class="flow" d="M522,116.5 C546,116.5 549,115 573,115" marker-start="url(#arrow)"/>
   <text class="l" x="524" y="107.5">Wi-Fi</text>
   <path class="flow" d="M520,333.5 C544,333.5 549,332.5 573,332.5"/>

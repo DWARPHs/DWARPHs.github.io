@@ -18,7 +18,7 @@ df <- tibble::tribble(
   "DWARPH-commander", "available", "Python desktop application (formerly DWARPH-GUI) that discovers devices on the network, drives them and mirrors their SD cards",
   "DWARPH-CV", "available", "Python package for image analysis: duckweed segmentation (inference, training, annotation) and the ring reference for camera distance and tilt",
   "DWARPH-hardware", "available", "PCBs, 3D-printed parts and the list of off-the-shelf parts",
-  "DWARPH-lightCalibration", "available", "Light measurements: light distribution and per-device PAR",
+  "DWARPH-QC", "planned", "Guided step-by-step check that a device works before an experiment, with a report (part of DWARPH-firmware)",
   "DWARPH-manuscript", "planned", "Manuscript material and experiments for the method publication",
   "DWARPHs.github.io", "available", "Source code of this documentation"
 )

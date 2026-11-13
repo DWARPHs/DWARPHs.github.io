@@ -31,16 +31,16 @@ nodes:
       - text: PCBs, 3D-printed parts,
       - text: parts list
 
-  lightcal:
-    link: https://github.com/DWARPHs/DWARPH-lightCalibration
-    kind: repo
+  qc:
+    link: https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc
+    kind: planned
     box: [40, 250, 210, 130]
     items:
-      - title: DWARPH-
-      - title: lightCalibration
-      - text: light uniformity in the
-      - text: chamber, PAR per device
-
+      - title: DWARPH-QC
+      - text: "planned, in DWARPH-firmware:"
+      - text: guided check that a
+      - text: device works, step by
+      - text: step, with a report
   device:
     link: https://github.com/DWARPHs/DWARPH-firmware
     kind: repo
@@ -165,7 +165,7 @@ nodes:
 
 edges:
   - {from: [hardware, right, 0.5], to: [device, left, 0.18], style: flow, label: build}
-  - {from: [lightcal, right, 0.5], to: [device, left, 0.79], style: uses, label: [light, settings]}
+  - {from: [qc, right, 0.5], to: [device, left, 0.79], style: uses, label: checks}
   - {from: [device, right, 0.15], to: [commander, left, 0.3], style: flow, both: true, label: Wi-Fi}
   - {from: [device, right, 0.85], to: [mirror, left, 0.5], style: flow, label: SD card}
   - {from: [commander, bottom, 0.5], to: [mirror, top, 0.5], style: flow, label: mirrors}
