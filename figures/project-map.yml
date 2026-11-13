@@ -38,9 +38,9 @@ nodes:
     items:
       - title: DWARPH-QC
       - text: "planned, in DWARPH-firmware:"
-      - text: guided check that a
-      - text: device works, step by
-      - text: step, with a report
+      - text: after flashing, a guided
+      - text: check over USB; a device
+      - text: runs only once QC'd
   device:
     link: https://github.com/DWARPHs/DWARPH-firmware
     kind: repo

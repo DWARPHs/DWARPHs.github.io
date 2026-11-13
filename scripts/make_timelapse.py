@@ -232,8 +232,8 @@ def main(argv=None):
         label(canvas, f"{t:%d %b  %H:%M}", (20, S - 38), f_big)
         if sets[k] is not None:
             sp = sets[k]
-            label(canvas, f"set {sp['temp']:.0f} °C   red {100 * sp['red']:.0f} %   blue {100 * sp['blue']:.0f} %"
-                          f"   white {100 * sp['white']:.0f} %", (20, S - 84), f_small)
+            label(canvas, f"set {sp['temp']:.0f} °C   light: red {100 * sp['red']:.0f} %, blue {100 * sp['blue']:.0f} %",
+                  (20, S - 84), f_small)
         label(canvas, "image", (20, 16), f_small)
         label(canvas, f"model mask: {cover[k]:.0f} % of the ring", (S + 20, 16), f_small)
         canvas.paste(curve_frame(times, cover, k, 2 * S, a.curve_height, nights), (0, S))

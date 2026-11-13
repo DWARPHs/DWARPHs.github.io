@@ -45,9 +45,9 @@
   <rect class="planned" x="40" y="250" width="210" height="130" rx="12"/>
   <text class="t" x="56" y="278">DWARPH-QC</text>
   <text class="s" x="56" y="300">planned, in DWARPH-firmware:</text>
-  <text class="s" x="56" y="319">guided check that a</text>
-  <text class="s" x="56" y="338">device works, step by</text>
-  <text class="s" x="56" y="357">step, with a report</text>
+  <text class="s" x="56" y="319">after flashing, a guided</text>
+  <text class="s" x="56" y="338">check over USB; a device</text>
+  <text class="s" x="56" y="357">runs only once QC&#x27;d</text>
   </a>
   <a href="https://github.com/DWARPHs/DWARPH-firmware" target="_blank" rel="noopener">
   <title>DWARPH device: https://github.com/DWARPHs/DWARPH-firmware</title>
