@@ -4,7 +4,7 @@
 # connect. `python scripts/make_project_map.py` draws assets/project-map.svg from it.
 #
 # kinds:   repo (green), data (blue, on disk), published (purple, has a DOI),
-#          planned (dashed: planned, or not on GitHub), old (grey: superseded)
+#          planned (dashed: planned, or not on GitHub), old (grey: superseded, unused)
 # items:   {title: ...}  bold line      {text: ...}  normal line
 #          {code: ...}   monospace      {rule: true} separator      {space: N} extra space (px)
 # edges:   from/to: node id, side (left|right|top|bottom), position along that side (0-1)
@@ -147,16 +147,9 @@ nodes:
       - text: "proposed: paper, analyses"
       - text: and figures, reproducible
 
-  merged:
-    kind: old
-    box: [40, 610, 760, 64]
-    items:
-      - text: "**Merged into DWARPH-CV, archived (read-only):**"
-      - text: DWARPH-segmentation, DWARPH-ringrefrence, DWARPH-annotation (history kept)
-
   hub:
     kind: planned
-    box: [870, 610, 495, 64]
+    box: [575, 610, 525, 64]
     items:
       - text: "**Planned: online hub**"
       - text: Commanders sync to a server; shared dashboard and API
