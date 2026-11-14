@@ -19,6 +19,7 @@ The steps, in order:
 
 1. [.](printed_parts.md){step}
 1. [.](boards.md){step}
+1. [.](coating.md){step}
 1. [.](rtc_cell.md){step}
 1. [.](camera.md){step}
 1. [.](wiring.md){step}

@@ -111,3 +111,29 @@ screwdriver:
 printer:
     Name: 3D printer (FDM)
     Description: "TODO: material and settings used for the DWARPH parts."
+
+conformal_coating:
+    Name: Conformal coating
+    Description: >
+        Protects the heater / temperature-sensor board from humidity and condensation.
+        TODO: the product used in DWARPH (acrylic, silicone or urethane; spray or brush-on).
+        A coating with a UV tracer makes the inspection much easier.
+
+ipa:
+    Name: Isopropyl alcohol (99 %)
+    Description: For cleaning flux and grease off the board before coating.
+
+masking_tape:
+    Name: Polyimide (Kapton) masking tape
+    Description: To mask connectors and contacts that must stay uncoated.
+
+coating_brush:
+    Name: Small flat brush
+    Description: For brush-on coating and touch-ups (not needed with a spray).
+
+gloves:
+    Name: Nitrile gloves
+
+uv_torch:
+    Name: UV torch (365-395 nm)
+    Description: To see where a UV-tracer coating is, and where it is missing. Optional.
