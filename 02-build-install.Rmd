@@ -1,5 +1,9 @@
 # Building and installation {#build}
 
+> **Building a device?** Follow the step-by-step **[device build guide](build/)**: parts and
+> bill of materials, circuit boards, clock battery, camera, wiring, assembly, flashing, and the
+> DWARPH-QC check. This chapter covers the software side.
+
 The three software components install independently: the **firmware** has to be compiled and flashed onto each device, the **Commander** is installed once on the machine you want to drive the devices from, and **DWARPH-CV** goes on whichever machine analyses the images. You do not need the firmware toolchain to run the Commander, or vice versa.
 
 ## Firmware {#build-firmware}

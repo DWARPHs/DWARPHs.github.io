@@ -38,6 +38,11 @@ The project map (Figure 2.1, `assets/project-map.svg`) is drawn from its descrip
 connect, and where each part links to (each box is clickable). Edit the YAML, then run `python scripts/make_project_map.py` (needs PyYAML;
 `--png preview.png` also renders a preview). Don't edit the SVG by hand.
 
+The **device build guide** is a separate [GitBuilding](https://gitbuilding.io) site in
+[`build-guide/`](build-guide/), published at `/build/`: one Markdown page per step, parts in
+`Parts.yaml`, and the bill of materials worked out from them. Preview it with
+`pip install gitbuilding==0.14.9`, then `cd build-guide && gitbuilding serve`.
+
 Chapters are ordered by filename. `index.Rmd` carries the site metadata;
 `_output.yml` and `_bookdown.yml` hold the build configuration.
 

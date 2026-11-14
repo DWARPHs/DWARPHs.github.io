@@ -1,0 +1,113 @@
+# Parts library of the DWARPH device. Each page refers to these by id; GitBuilding adds up
+# the quantities into the bill of materials. Board files are in the DWARPH-hardware repository.
+
+mainboard:
+    Name: DWARPH mainboard (assembled)
+    Description: >
+        Main circuit board: power input (12 V barrel jack, fuse), regulators, RTC (DS3231M)
+        with its CR1220 holder, and the connectors to the other boards. Order it assembled:
+        Gerbers, BOM and pick-and-place files are in DWARPH-hardware, PCBs/fabrication/Mainboard/.
+    Specs:
+        RTC: DS3231M
+        Coin cell holder: CR1220
+        Power input: 12 V, DC-005 barrel jack, fused
+
+heater_board:
+    Name: Heater / temperature-sensor board (assembled)
+    Description: >
+        Heating element driver and three TMP119 temperature sensors (I2C). Files in
+        DWARPH-hardware, PCBs/fabrication/Temp_sens_heater_combo_TMP119/.
+    Specs:
+        Sensors: 3 × TMP119
+
+led_board:
+    Name: LED board (assembled)
+    Description: >
+        Red, blue and white LEDs driven by a PCA9955B (I2C). Files in DWARPH-hardware,
+        PCBs/fabrication/led_board_PCA9955B/.
+    Specs:
+        Driver: PCA9955B
+        Channels: red, blue, white
+
+distribution_board:
+    Name: 12 V distribution board (assembled)
+    Description: >
+        Shared by several devices: one 12 V input (XT30) and fused barrel-jack outputs to the
+        devices. Files in DWARPH-hardware, PCBs/fabrication/12V_distribution_board/.
+    Specs:
+        Input: XT30
+        Outputs: 10 × DC-005 barrel jack
+
+xiao:
+    Name: Seeed Studio XIAO ESP32S3 Sense
+    Description: >
+        The microcontroller board (ESP32-S3) with its camera connector and microSD slot.
+    Suppliers:
+        Seeed Studio:
+            PartNo: XIAO ESP32S3 Sense
+            Link: https://www.seeedstudio.com/
+
+camera:
+    Name: OV5640 autofocus camera module
+    Description: >
+        5 MP camera for the XIAO ESP32S3 Sense camera connector (the firmware uses the OV5640
+        autofocus driver).
+
+antenna:
+    Name: 2.4 GHz Wi-Fi antenna, U.FL
+    Description: >
+        External antenna for the XIAO. TODO: model and cable length used in DWARPH.
+
+cr1220:
+    Name: CR1220 coin cell
+    Description: >
+        3 V lithium coin cell that keeps the RTC running when the device has no power.
+        Without it the clock is lost at every power cut and the device waits instead of running.
+
+microsd:
+    Name: microSD card, 32 GB
+    Description: >
+        Holds the pictures, their metadata, the logs and the schedule. 32 GB holds weeks of
+        pictures at one every few minutes. FAT32 or exFAT.
+
+psu_12v:
+    Name: 12 V power supply
+    Description: >
+        Feeds the distribution board. TODO: rating used in DWARPH (current per device x devices).
+
+ring:
+    Name: Red reference ring
+    Description: >
+        Red ring of known size placed in the vessel: the growing area, and the reference used
+        by DWARPH-CV to measure the camera's distance and tilt.
+    Specs:
+        Inner diameter: 30.5 mm
+        Outer diameter: 34.5 mm
+        Thickness: 2 mm
+
+cable_i2c:
+    Name: 4-pin SH 1.0 mm cable
+    Description: >
+        Connects the mainboard to the heater/sensor board and to the LED board.
+        TODO: lengths.
+
+usb_c:
+    Name: USB-C data cable
+    Description: >
+        For flashing the firmware and running DWARPH-QC. Must carry data, not only power.
+
+computer:
+    Name: Computer with ESP-IDF and Python 3
+    Description: >
+        To build and flash the firmware and run the QC script (Linux, macOS or Windows).
+
+multimeter:
+    Name: Multimeter
+
+screwdriver:
+    Name: Screwdriver
+    Description: "TODO: size(s) for the DWARPH screws."
+
+printer:
+    Name: 3D printer (FDM)
+    Description: "TODO: material and settings used for the DWARPH parts."

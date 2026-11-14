@@ -1,0 +1,16 @@
+# GitBuilding configuration of the DWARPH device build guide (published at /build/)
+Title: 'DWARPH device: build guide'
+Authors:
+    - The DWARPH contributors
+Affiliation: DWARPHs
+# TODO: licence of the hardware documentation (e.g. CERN-OHL-W-2.0 or CC-BY-4.0)
+#License: CERN-OHL-W-2.0
+WebsiteRoot: '/build/'
+PageBOMTitle: '## For this step you will need'
+CustomCategories:
+    printed:
+        Reuse: False
+        DisplayName: 3D-printed parts
+    board:
+        Reuse: False
+        DisplayName: Circuit boards

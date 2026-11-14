@@ -7,6 +7,7 @@ bookdown::gitbook:
         <li><a href="./" class="dwarph-brand"><img src="assets/icons/logo-sidebar.png" alt="" width="60" height="60"><span><b>DWARPH</b> documentation</span></a></li>
       after: |
         <li>
+        <a href="build/">Device build guide</a>
         <a href="https://github.com/DWARPHs" target="blank">DWARPHs on GitHub</a>
         <a href="https://bookdown.org/yihui/bookdown/" target="blank">Published with bookdown</a>
         </li>
