@@ -16,12 +16,18 @@ plants. It is a Python package (`dwarph_cv`) with one command, `dwarph-cv`:
   ground-truth masks for whole time-lapse series.
 * **Worker** (`dwarph-cv worker`) --- analyses a DWARPH hub's pictures (Section \@ref(cv-worker)).
 
-```{r segmentation-timelapse, echo=FALSE, fig.cap="The platform, then one week of device `C4E408` with the released segmentation model: the image (left), the model's mask with the inner edge of the reference ring in red (right), and the proportion of the ring covered by duckweed over time (below), one frame per hour. The image shows the program's set temperature and light levels; grey bands in the graph are the program's nights (all lights off), which follow the experiment's schedule rather than the clock. Made with `scripts/make_timelapse.py`."}
-knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
-```
+**How a picture becomes a measurement.** The segmentation and the ring detection work on the same
+picture independently. The mask says where the duckweed is; the ring says where the growing area
+is, and how far and how tilted the camera was. Their combination, the proportion of the area inside
+the ring that the mask covers, is the coverage: one number per picture, and over a run, a growth
+curve. On pictures of devices it was not trained on, the segmentation agrees closely with the
+annotators' masks (Figure \@ref(fig:cv-pipeline)C).
 
-The data and the model are published on Zenodo (Chapter \@ref(publications)). Tested on a device
-it has not seen (leave-one-device-out), the model reaches an IoU of 0.976 ± 0.007.
+<div class="figure" style="text-align: center">
+<span style="display:block;" id="fig:cv-pipeline"></span>
+<img src="assets/cv-pipeline.svg" alt="The image-analysis pipeline: raw image, segmentation, ring detection, ring coverage; an example image with its mask and ring; predicted against true coverage on unseen devices" style="width: 100%; max-width: 1100px;">
+<p class="caption">(\#fig:cv-pipeline) From pictures to growth. **A** The pipeline: each raw picture is segmented (U-Net, ResNet34 encoder) into a duckweed mask, and the red reference ring is detected (inner and outer ellipse, camera pose); the mask inside the ring's inner edge, divided by the area inside it, is the ring coverage, which over a run gives the growth curve (device `C4E408`, the picture shown marked). **B** The picture, undistorted, with the edges of the mask (blue) and the detected inner edge of the ring (orange). **C** Segmentation on devices the model has not seen: each of the 13,615 annotated pictures scored by the model trained without its device (leave-one-device-out), coverage predicted against annotated, with the agreement statistics. *(Draft figure for the DWARPH paper.)*</p>
+</div>
 
 ## How to install {#cv-install}
 
@@ -59,3 +65,18 @@ detection and the segmentation, and sends back the results and the mask. With no
 waits for new pictures. Any number of workers can run at once, on as many computers. Connecting a
 computer as a permanent worker, and moving all workers to a new model version, is described in
 Section \@ref(hub-workers).
+
+## Resources {#cv-resources}
+
+The data and the model behind DWARPH-CV are published on Zenodo (Chapter \@ref(publications)):
+
+* **[DWARPH duckweed segmentation dataset v1.0](https://doi.org/10.5281/zenodo.24164026)** ---
+  13,581 pictures from 7 devices with their ground-truth masks and metadata, for training or
+  testing other methods (doi:10.5281/zenodo.24164026).
+* **[DWARPH segmentation weights v1.0](https://doi.org/10.5281/zenodo.24164133)**
+  (`unet_r34_duckweed`) --- the released model, trained on all of that dataset. `dwarph-cv segment`
+  and the workers download it on first use and check its checksum (doi:10.5281/zenodo.24164133).
+
+The training run behind the released model (its settings, history and the leave-one-device-out
+results) is in the repository, under `docs/results/`.
+

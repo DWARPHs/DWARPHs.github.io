@@ -5,6 +5,7 @@ language:
     chapter_name: "Chapter "
 rmd_files:
   - index.Rmd
+  - 00-modules.Rmd
   - 01-device.Rmd
   - 02-commander.Rmd
   - 03-cv.Rmd
