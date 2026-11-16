@@ -1,0 +1,61 @@
+# DWARPH-CV {#cv}
+
+[DWARPH-CV](https://github.com/DWARPHs/DWARPH-CV) turns the pictures into measurements of the
+plants. It is a Python package (`dwarph_cv`) with one command, `dwarph-cv`:
+
+* **Segmentation** (`dwarph-cv segment`) --- a U-Net with a ResNet34 encoder makes a duckweed mask
+  for every picture, and a table of the area covered. It runs on whole 1920×1920 pictures, on a
+  GPU or a CPU.
+* **Ring reference** (`dwarph-cv ring`, `dwarph-cv ring-coverage`) --- finds the red reference ring
+  and solves the camera's position, giving its distance and tilt for each picture. The ring also
+  bounds the growing area: **ring coverage** is the proportion of the area inside the ring that
+  duckweed covers, which does not depend on the camera's distance. It is the measure of growth.
+* **Training** (`dwarph-cv train`, optional) --- leave-one-device-out training and evaluation, and
+  training on all data for a release.
+* **Annotation** (`dwarph-cv annotate`, optional) --- an interactive SAM 2.1 tool to make
+  ground-truth masks for whole time-lapse series.
+* **Worker** (`dwarph-cv worker`) --- analyses a DWARPH hub's pictures (Section \@ref(cv-worker)).
+
+```{r segmentation-timelapse, echo=FALSE, fig.cap="The platform, then one week of device `C4E408` with the released segmentation model: the image (left), the model's mask with the inner edge of the reference ring in red (right), and the proportion of the ring covered by duckweed over time (below), one frame per hour. The image shows the program's set temperature and light levels; grey bands in the graph are the program's nights (all lights off), which follow the experiment's schedule rather than the clock. Made with `scripts/make_timelapse.py`."}
+knitr::include_graphics("assets/duckweed_segmentation_C4E408.webp")
+```
+
+The data and the model are published on Zenodo (Chapter \@ref(publications)). Tested on a device
+it has not seen (leave-one-device-out), the model reaches an IoU of 0.976 ± 0.007.
+
+## How to install {#cv-install}
+
+You need Python 3.10 or newer and PyTorch: a CUDA build if the computer has an NVIDIA GPU (see
+[pytorch.org](https://pytorch.org/get-started/locally/)); the CPU build works too, more slowly.
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126   # or .../whl/cpu
+
+git clone https://github.com/DWARPHs/DWARPH-CV.git
+cd DWARPH-CV
+pip install -e .                 # segmentation, ring reference, worker
+pip install -e '.[train]'        # optional: training
+pip install -e '.[annotate]'     # optional: SAM 2.1 annotator (NVIDIA GPU needed)
+
+dwarph-cv segment --input /path/to/Device_mirror/C4E408 --output preds   # masks + areas.csv
+dwarph-cv ring --root /path/to/Device_mirror/C4E408                       # camera distance and tilt
+```
+
+The first run downloads the released model from Zenodo, checks its checksum and keeps it in
+`~/.cache/dwarph_cv/`. `--weights path/to/model.pt` uses your own model instead. `dwarph-cv --help`
+lists all the commands.
+
+## Worker {#cv-worker}
+
+With a DWARPH hub (Chapter \@ref(hub)), there is nothing to run by hand: **workers** analyse every
+new picture as it arrives. A worker is DWARPH-CV on any computer, ideally one with a GPU:
+
+```bash
+dwarph-cv worker --hub https://hub.example.org --credentials ~/.config/dwarph/worker.json
+```
+
+It takes pictures from the hub's queue, newest first, downloads each one once, runs the ring
+detection and the segmentation, and sends back the results and the mask. With nothing to do, it
+waits for new pictures. Any number of workers can run at once, on as many computers. Connecting a
+computer as a permanent worker, and moving all workers to a new model version, is described in
+Section \@ref(hub-workers).

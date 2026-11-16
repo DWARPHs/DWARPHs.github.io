@@ -39,6 +39,9 @@ jobs:
       - name: Copy icons (bookdown only copies files the pages link to)
         run: mkdir -p _book/assets && cp -r assets/icons _book/assets/
 
+      - name: Redirects from the pages of the earlier chapter layout
+        run: cp redirects/*.html _book/
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

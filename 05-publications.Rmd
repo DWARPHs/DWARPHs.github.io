@@ -1,0 +1,29 @@
+# Publications {#publications}
+
+## The DWARPH paper {-}
+
+*A paper describing the platform and its validation is in preparation.* Until it is out, please
+cite the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`) and, for the analysis, the dataset and
+the model below.
+
+## Dataset and model {-}
+
+Both are on Zenodo:
+
+* **DWARPH duckweed segmentation dataset** v1.0 --- 13,581 images from 7 devices, with their
+  ground-truth masks and metadata: [doi:10.5281/zenodo.24164026](https://doi.org/10.5281/zenodo.24164026)
+  (all versions: [doi:10.5281/zenodo.24164025](https://doi.org/10.5281/zenodo.24164025)).
+* **DWARPH segmentation weights** (`unet_r34_duckweed` v1.0) --- the U-Net/ResNet34 model trained on
+  all of that dataset, used by `dwarph-cv segment` and the hub's workers:
+  [doi:10.5281/zenodo.24164133](https://doi.org/10.5281/zenodo.24164133)
+  (all versions: [doi:10.5281/zenodo.24164132](https://doi.org/10.5281/zenodo.24164132)).
+
+Cite the version you used (the first DOI of each); the "all versions" DOI always points to the
+latest.
+
+## Using DWARPH in your work {-}
+
+If you publish results obtained with DWARPH, please say which firmware and DWARPH-CV versions,
+which model version, and which schedules you used, and keep the schedules with your data (the hub
+keeps them per experiment). We would be glad to list your paper here: open an issue or a pull
+request (Chapter \@ref(community)).

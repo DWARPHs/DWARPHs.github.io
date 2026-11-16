@@ -1,6 +1,6 @@
 # Technical reference {#reference}
 
-This chapter is the formal reference for the schedule file format and the two network interfaces a device exposes. Chapter \@ref(manual) covers the same ground in practical terms; if you are running an experiment rather than writing software against the platform, start there.
+This appendix is the formal reference for the schedule file format and the two network interfaces a device exposes. Appendix \@ref(manual) covers the same ground in practical terms; if you are running an experiment rather than writing software against the platform, start there.
 
 ## Schedule file format {#schedule-format}
 

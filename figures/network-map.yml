@@ -1,0 +1,89 @@
+# How DWARPH devices, the router, the Commander and (optionally) the hub connect.
+#   python scripts/make_project_map.py --spec figures/network-map.yml --out assets/network-map.svg
+# Same format as project-map.yml. Dashed boxes are optional.
+title: How DWARPH devices, the Commander and the hub connect
+canvas: {width: 1250, height: 430}
+columns:
+  - {label: "YOUR LAB: ONE LOCAL NETWORK", x: 40}
+  - {label: "INTERNET: OPTIONAL", x: 985}
+
+nodes:
+  dev1:
+    kind: repo
+    box: [40, 70, 230, 78]
+    items:
+      - title: DWARPH device
+      - text: runs its schedule on its own
+      - code: dwarph-C4E408
+  dev2:
+    kind: repo
+    box: [40, 168, 230, 78]
+    items:
+      - title: DWARPH device
+      - text: its own conditions
+      - code: dwarph-4F4D54
+  dev3:
+    kind: repo
+    box: [40, 266, 230, 78]
+    items:
+      - title: DWARPH device
+      - text: ... as many as you like
+      - code: dwarph-E41240
+
+  router:
+    kind: data
+    box: [370, 140, 240, 134]
+    items:
+      - title: Wi-Fi router
+      - text: the network name and
+      - text: password are in each
+      - text: device's schedule
+      - text: "mDNS must not be blocked"
+
+  commander:
+    link: https://github.com/DWARPHs/DWARPH-commander
+    kind: repo
+    box: [690, 96, 240, 222]
+    items:
+      - title: Commander computer
+      - text: on the same network
+      - rule: true
+      - code: DWARPH-commander
+      - text: finds devices, live view,
+      - text: schedules, start / stop
+      - space: 6
+      - code: MQTT broker
+      - text: live readings (optional)
+      - space: 6
+      - code: Device mirror
+      - text: copies of the SD cards
+
+  hub:
+    link: https://github.com/DWARPHs/DWARPH-hub
+    kind: planned
+    tag: OPTIONAL
+    box: [985, 70, 235, 150]
+    items:
+      - title: DWARPH-hub
+      - text: one server for many
+      - text: "labs: images, analysis,"
+      - text: projects, viewer
+      - code: https://hub.<domain>
+
+  worker:
+    link: https://github.com/DWARPHs/DWARPH-CV
+    kind: planned
+    tag: OPTIONAL
+    box: [985, 290, 235, 110]
+    items:
+      - title: GPU computer
+      - text: analyses the hub's images
+      - code: dwarph-cv worker
+
+edges:
+  - {from: [dev1, right, 0.5], to: [router, left, 0.25], style: flow, both: true, label: Wi-Fi}
+  - {from: [dev2, right, 0.5], to: [router, left, 0.5], style: flow, both: true}
+  - {from: [dev3, right, 0.5], to: [router, left, 0.75], style: flow, both: true}
+  - {from: [router, right, 0.5], to: [commander, left, 0.5], style: flow, both: true, label: [discovery, "REST · MQTT"]}
+  - {from: [commander, right, 0.3], to: [hub, left, 0.5], style: uses, label: ["sync", "(HTTPS)"]}
+  - {from: [worker, top, 0.5], to: [hub, bottom, 0.5], style: uses, both: true, label: ["", "images ⇄ results"], label_at: [1108, 262]}

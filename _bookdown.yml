@@ -3,5 +3,16 @@ delete_merged_file: true
 language:
   ui:
     chapter_name: "Chapter "
+rmd_files:
+  - index.Rmd
+  - 01-device.Rmd
+  - 02-commander.Rmd
+  - 03-cv.Rmd
+  - 04-hub.Rmd
+  - 05-publications.Rmd
+  - 99-community.Rmd
+  - 90-running.Rmd
+  - 91-schedule-builder.Rmd
+  - 92-reference.Rmd
 
 before_chapter_script: "r_options.R"

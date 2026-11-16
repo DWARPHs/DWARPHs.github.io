@@ -1,19 +1,13 @@
 # Issues and community {#community}
 
-## Citation {-}
-
-DWARPH is a research tool, and is --- and will remain --- as free and open-source as possible.
-
-<!-- TODO: replace with the DWARPH reference publication and its DOI once published. -->
-*A reference publication is in preparation. Until it is out, please cite the [DWARPHs GitHub organisation](`r GITHUB_ORG_URL`) if you use the platform in your research.*
-
 ## Having trouble {-}
 
 If something is broken or you are stuck, the best thing you can do is **open an issue on the GitHub repository of the relevant component**:
 
-* Firmware, hardware, scheduling, the REST API --- [DWARPH-firmware](https://github.com/DWARPHs/DWARPH-firmware/issues)
+* Firmware, QC, scheduling, the REST API --- [DWARPH-firmware](https://github.com/DWARPHs/DWARPH-firmware/issues)
 * The desktop dashboard, discovery, MQTT --- [DWARPH-commander](https://github.com/DWARPHs/DWARPH-commander/issues)
-* Image analysis, segmentation, the released model --- [DWARPH-CV](https://github.com/DWARPHs/DWARPH-CV/issues)
+* Image analysis, segmentation, the released model, workers --- [DWARPH-CV](https://github.com/DWARPHs/DWARPH-CV/issues)
+* The hub: projects, the viewer, sync --- [DWARPH-hub](https://github.com/DWARPHs/DWARPH-hub/issues)
 * PCBs and printed parts --- [DWARPH-hardware](https://github.com/DWARPHs/DWARPH-hardware/issues)
 * This documentation --- [DWARPHs.github.io](https://github.com/DWARPHs/DWARPHs.github.io/issues)
 
