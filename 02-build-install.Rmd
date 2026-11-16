@@ -4,7 +4,7 @@
 > bill of materials, circuit boards, clock battery, camera, wiring, assembly, flashing, and the
 > DWARPH-QC check. This chapter covers the software side.
 
-The three software components install independently: the **firmware** has to be compiled and flashed onto each device, the **Commander** is installed once on the machine you want to drive the devices from, and **DWARPH-CV** goes on whichever machine analyses the images. You do not need the firmware toolchain to run the Commander, or vice versa.
+The three software components install independently: the **firmware** has to be compiled and flashed onto each device, the **Commander** is installed once on the machine you want to drive the devices from, and **DWARPH-CV** goes on whichever machine analyses the images. You do not need the firmware toolchain to run the Commander, or vice versa. The **hub** is optional, for large set-ups only (Section \@ref(build-hub)).
 
 ## Firmware {#build-firmware}
 
@@ -92,3 +92,79 @@ The first `segment` run downloads the released model from Zenodo and caches it i
 MQTT is **optional**. Without it, devices are still fully controllable over REST; what you lose is the once-per-second live update on the device cards.
 
 To enable it, run an MQTT broker reachable by both the devices and the Commander --- [Mosquitto](https://mosquitto.org/) is the usual choice, and the Commander repository ships a `mosquitto.conf` to start from --- then add the broker fields to each device's schedule as described in Section \@ref(mqtt).
+
+## DWARPH-hub (optional) {#build-hub}
+
+Only for large set-ups (Section \@ref(hub-module)). A single lab does not need it.
+
+### Deploy {-}
+
+You need:
+
+* a **Linux server** with Docker and the compose plugin, ports 80 and 443 open: 4 GB of memory for
+  real use (2 GB is enough to try it);
+* a **domain** with two DNS records pointing at the server, for example `hub.example.org` (the
+  hub) and `auth.example.org` (signing in);
+* an **S3 bucket** (e.g. Linode or AWS object storage) and an access key **limited to that
+  bucket**.
+
+```bash
+git clone https://github.com/DWARPHs/DWARPH-hub.git && cd DWARPH-hub
+cp deploy/prod.env.example deploy/prod.env      # host names, bucket, key id
+# one secret per file in secrets/ (database, the bucket key's secret, Authentik):
+# the commands are in deploy/README.md
+docker network create dwarph-edge
+docker compose --env-file deploy/prod.env -f docker-compose.edge.yml up -d    # HTTPS
+docker compose --env-file deploy/prod.env -f docker-compose.prod.yml up -d --build
+curl https://hub.example.org/healthz
+```
+
+Then open `https://auth.example.org/if/flow/initial-setup/` **straight away** to set the
+administrator's password, create the people's accounts in Authentik, and put yourself in the
+group **`dwarph-admins`** (the hub's administrators). A person needs a role on the hub to see
+anything: **reader** for people. Machines get the roles below. Backups (a nightly `pg_dump`;
+the images are in the bucket) and updates are in the repository's `deploy/README.md`.
+
+### Connect a Commander {-}
+
+Each lab's Commander pushes its device mirror to the hub with a **machine account**:
+
+1. In Authentik, create a service account for the lab and an app password for it, and give it
+   the **contributor** role on the hub (`PUT /v1/access/<id>` with `{"role": "contributor"}`).
+2. On the lab's computer, put its credentials in `~/.config/dwarph/hub.json` (mode 600):
+   `{"issuer": "https://auth.example.org/application/o/dwarph-commander/", "client_id": "dwarph-commander", "username": "...", "password": "..."}`.
+3. Push the mirror the Commander keeps:
+
+```bash
+python tools/push_mirror.py --hub https://hub.example.org --credentials ~/.config/dwarph/hub.json \
+    --mirror /path/to/Device_mirror --jobs 8
+```
+
+Pushing is safe to repeat (images already on the hub are skipped) and never changes the mirror.
+Each image is checked against its device's checksum before it is sent, and again by the hub
+once it is stored; an image without a readable sidecar is not sent. Run it from `cron` to keep
+the hub up to date. *(The Commander will do this by itself once it runs as Docker services; the
+protocol is `contract/SYNC.md` in the hub's repository.)*
+
+### Connect DWARPH-CV workers {-}
+
+Any computer can analyse the hub's images; one with an NVIDIA GPU does it quickly.
+
+1. Give it a machine account as above, with the **worker** role, and its credentials in
+   `~/.config/dwarph/worker.json`.
+2. Once, an administrator registers the algorithms this version of DWARPH-CV computes (this
+   queues every image for them):
+   `dwarph-cv worker --hub https://hub.example.org --credentials admin.json --register-only`.
+3. Run the worker:
+
+```bash
+dwarph-cv worker --hub https://hub.example.org --credentials ~/.config/dwarph/worker.json
+```
+
+It takes images newest first, downloads each one once, runs the ring detection and the
+segmentation, and sends back the results and the mask; with nothing left to do it waits for new
+images. Start as many workers as you like, on as many computers. To keep one running permanently,
+install it as a service with `tools/worker/` in DWARPH-CV: the service updates DWARPH-CV whenever
+it restarts. When a new ring or model version is released, register it with `--register-only
+--retire-older`. Every worker then moves to the new version by itself, every image is analysed
+again, and the old results are kept.

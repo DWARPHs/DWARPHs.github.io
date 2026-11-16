@@ -173,13 +173,66 @@ Images and logs are written to the **SD card**, in a folder named after the devi
 knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
 ```
 
-To measure the plants in these images, see DWARPH-CV (Section \@ref(ml-module)).
+To measure the plants in these images, see DWARPH-CV (Section \@ref(ml-module)). If your institute runs a DWARPH hub, the images are also there, already measured (Section \@ref(hub)).
 
 At the end of a run, take the card out and copy the folder off it. You can also pull files over the network through the Commander, which is convenient for spot-checks mid-experiment but slower for an entire run.
 
 Keep the schedule file with the images. It is the record of what conditions the plants actually experienced, and in six months it will be the only thing that tells you what device `XYZABC` was doing.
 
 <!-- TODO: document the log file format and the image file naming convention. -->
+
+## Using the hub (optional) {#hub}
+
+If your institute runs a DWARPH hub (Section \@ref(hub-module)), the images of every device are
+there, already analysed, and you can define your experiments and look at them in a browser. Sign
+in with the account you were given. The navigation bar has a **project selector** and two
+pages, **Project** and **Visualise**.
+
+### Projects: what was done, on which device, when {-}
+
+A **project** is a table with **one row per experiment**: a **device**, a **start** and an
+**end**, written `2026-09-10 12:23:00` in UTC. An empty end means the experiment is still
+running. Add your own **columns** for what differs between experiments (genotype, treatment,
+replicate, ...), each with a type: text, number, whole number, yes/no, date, date-time, or a
+**category** (a fixed list of values, which avoids `wt`, `WT` and `wild type` in one
+column).
+
+* **Create** a project with **＋ New project…** in the selector. (*All* is reserved: it means
+  every device, no project.)
+* **Edit** the table in place: Tab and Enter move between cells, and a block **pasted from a
+  spreadsheet** fills the table, adding rows as needed. Cells that are not valid turn red, and
+  rows where one device runs two experiments at the same time turn amber. Each row shows how
+  many images the device took in that time and how many are analysed.
+* **Save** with a short note of what changed. Every save is kept: **History** shows who changed
+  what and when, any old version can be looked at, and **Revert** brings one back (as a new
+  version, so nothing is lost). If someone else saved while you were editing, your save is
+  refused rather than overwriting theirs.
+* **Members** (owners only): enrol people as **viewer** (sees the project), **manager** (also edits
+  the table) or **owner** (also enrols people). A project is seen only by its members. People
+  are listed once they have signed in to the hub.
+* **CSV** downloads the table with the image counts, for R, Python or a spreadsheet.
+
+### Visualise: devices and experiments over time {-}
+
+With **All** selected, every device is shown over time. With a project, choose the **time
+axis**:
+
+* **Date**: the project's devices, showing only their images inside the project's experiments;
+* **Experiment time**: one row per experiment, labelled with its device, start and values, with
+  time counted in **days since the experiment started**. Use this to compare experiments that
+  did not start on the same day.
+
+Then choose how to show them: **one row each** (the same scale in every row), **overlaid** (one
+line per experiment, which can be coloured by a column, e.g. all wild-type curves one colour),
+or **strips** (when images were taken, coloured by a value). On the *y* axis or as the colour
+you can plot what the devices recorded (temperature, set temperature, lights, ...) and what the
+analysis found: **ring coverage** (the proportion of the ring covered by duckweed, which is the
+measure of growth), duckweed area, and the camera's distance and tilt.
+
+Hover over a point to see the image, and click it to open it with its details. The **mask**
+menu shows the segmentation over the image, steadily or **flickering** (the easiest way to
+judge it). ← and → step through the series, and Space plays it. The hub remembers your
+settings for each project.
 
 ## When something goes wrong {#troubleshooting}
 

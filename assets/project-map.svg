@@ -104,10 +104,14 @@
   <text class="t" x="816" y="313">Device mirror</text>
   <text class="s" x="816" y="335">copy of every SD card</text>
   <text class="m" x="816" y="354">&lt;device&gt;/&lt;day&gt;/*.jpg+.json</text>
-  <rect class="planned" x="800" y="445" width="240" height="95" rx="12"/>
-  <text class="t" x="816" y="473">DWARPH_DB</text>
-  <text class="s" x="816" y="495">local catalogue and viewer</text>
-  <text class="s" x="816" y="514">not on GitHub yet</text>
+  <a href="https://github.com/DWARPHs/DWARPH-hub/tree/main/local" target="_blank" rel="noopener">
+  <title>Local store: https://github.com/DWARPHs/DWARPH-hub/tree/main/local</title>
+  <rect class="repo" x="800" y="445" width="240" height="95" rx="12"/>
+  <text class="tag tag-repo" x="816" y="467">PART OF DWARPH-HUB</text>
+  <text class="t" x="816" y="486">Local store</text>
+  <text class="s" x="816" y="508">catalogue and viewer</text>
+  <text class="s" x="816" y="527">on one computer</text>
+  </a>
   <a href="https://github.com/DWARPHs/DWARPH-CV" target="_blank" rel="noopener">
   <title>DWARPH-CV: https://github.com/DWARPHs/DWARPH-CV</title>
   <rect class="repo" x="1110" y="70" width="230" height="470" rx="12"/>
@@ -157,9 +161,13 @@
   <text class="t" x="1421" y="488">DWARPH-manuscript</text>
   <text class="s" x="1421" y="510">proposed: paper, analyses</text>
   <text class="s" x="1421" y="529">and figures, reproducible</text>
-  <rect class="planned" x="800" y="610" width="540" height="64" rx="10"/>
-  <text class="b" x="816" y="636">Planned: online hub</text>
-  <text class="s" x="816" y="655">Commanders sync to a server; shared dashboard and API</text>
+  <a href="https://github.com/DWARPHs/DWARPH-hub" target="_blank" rel="noopener">
+  <title>DWARPH-hub: https://github.com/DWARPHs/DWARPH-hub</title>
+  <rect class="repo" x="800" y="595" width="540" height="88" rx="12"/>
+  <text class="tag tag-repo" x="816" y="617">OPTIONAL, FOR LARGE SET-UPS</text>
+  <text class="t" x="816" y="636">DWARPH-hub</text>
+  <text class="s" x="816" y="658">online: all labs&#x27; images, analysed by CV workers; projects, viewer, API</text>
+  </a>
   <path class="flow" d="M250,125 L288,125.8"/>
   <text class="l" x="254" y="116">build</text>
   <path class="flow" d="M250,297.5 C274,297.5 264,296.3 288,296.3"/>
@@ -186,6 +194,10 @@
   <text class="l" x="1344" y="460.5">upload</text>
   <path class="uses" d="M1512.5,425 L1512.5,458"/>
   <path class="uses" d="M1620,117.5 C1648,117.5 1650,507.5 1622,507.5"/>
+  <path class="flow" d="M800,332.5 C772,332.5 770,639 798,639"/>
+  <text class="l" x="770" y="520">sync</text>
+  <path class="flow" d="M1225,542 C1225,566 1226.6,569 1226.6,593" marker-start="url(#arrow)"/>
+  <text class="l" x="1233" y="571.5">worker</text>
   <g transform="translate(40,712)">
     <rect class="repo" x="0" y="0" width="26" height="18" rx="4"/><text class="s" x="34" y="14">repository</text>
     <rect class="data" x="148" y="0" width="26" height="18" rx="4"/><text class="s" x="182" y="14">data on disk</text>

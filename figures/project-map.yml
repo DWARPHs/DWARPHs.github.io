@@ -109,12 +109,14 @@ nodes:
       - code: <device>/<day>/*.jpg+.json
 
   db:
-    kind: planned
+    link: https://github.com/DWARPHs/DWARPH-hub/tree/main/local
+    kind: repo
+    tag: PART OF DWARPH-HUB
     box: [800, 445, 240, 95]
     items:
-      - title: DWARPH_DB
-      - text: local catalogue and viewer
-      - text: not on GitHub yet
+      - title: Local store
+      - text: catalogue and viewer
+      - text: on one computer
 
   cv:
     link: https://github.com/DWARPHs/DWARPH-CV
@@ -182,11 +184,13 @@ nodes:
       - text: and figures, reproducible
 
   hub:
-    kind: planned
-    box: [800, 610, 540, 64]
+    link: https://github.com/DWARPHs/DWARPH-hub
+    kind: repo
+    tag: OPTIONAL, FOR LARGE SET-UPS
+    box: [800, 595, 540, 88]
     items:
-      - text: "**Planned: online hub**"
-      - text: Commanders sync to a server; shared dashboard and API
+      - title: DWARPH-hub
+      - text: "online: all labs' images, analysed by CV workers; projects, viewer, API"
 
 edges:
   - {from: [hardware, right, 0.5], to: [qc, left, 0.18], style: flow, label: build}
@@ -203,6 +207,8 @@ edges:
   - {from: [cv, right, 0.85], to: [dataset, left, 0.53], style: flow, label: upload}
   - {from: [dataset, bottom, 0.5], to: [manuscript, top, 0.5], style: uses}
   - {from: [weights, right, 0.5], to: [manuscript, right, 0.5], style: uses}
+  - {from: [mirror, left, 0.5], to: [hub, left, 0.5], style: flow, label: sync, label_at: [770, 520]}
+  - {from: [cv, bottom, 0.5], to: [hub, top, 0.79], style: flow, both: true, label: worker}
 
 legend:
   at: [40, 712]

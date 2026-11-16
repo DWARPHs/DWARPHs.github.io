@@ -17,6 +17,7 @@ df <- tibble::tribble(
   "DWARPH-firmware", "available", "ESP-IDF firmware running on the ESP32-S3 device: scheduling, temperature and light control, camera, REST API and MQTT",
   "DWARPH-commander", "available", "Python desktop application (formerly DWARPH-GUI) that discovers devices on the network, drives them and mirrors their SD cards",
   "DWARPH-CV", "available", "Python package for image analysis: duckweed segmentation (inference, training, annotation) and the ring reference for camera distance and tilt",
+  "DWARPH-hub", "available, optional", "Online server for large set-ups: collects every lab's images, has them analysed by DWARPH-CV workers, and shows experiments (projects) to the people enrolled in them. Also holds the local catalogue (formerly DWARPH_DB)",
   "DWARPH-hardware", "available", "PCBs, 3D-printed parts and the list of off-the-shelf parts",
   "DWARPH-QC", "planned", "After flashing, a guided step-by-step check of every part of the device over USB; a new device runs only once it is QC'd (part of DWARPH-firmware)",
   "DWARPH-manuscript", "planned", "Manuscript material and experiments for the method publication",
@@ -27,7 +28,7 @@ knitr::kable(df)
 
 ## How the parts fit together {#architecture}
 
-A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the Commander. There is no central server and no cloud component; everything happens on the local network.
+A DWARPH deployment has two halves: any number of **devices**, and one **operator workstation** running the Commander. There is no central server and no cloud component; everything happens on the local network. (A large set-up can add the optional online hub, Section \@ref(hub-module), but nothing on the local network depends on it.)
 
 * Each **device** boots, joins the WiFi network named in its schedule, and starts executing that schedule autonomously. It keeps running whether or not anyone is watching — images and logs accumulate on its SD card.
 * Each device **announces itself** over mDNS/ZeroConf, under a service name containing `dwarph`.
@@ -83,6 +84,35 @@ The data and the model are published on Zenodo:
 * the **DWARPH segmentation weights** (`unet_r34_duckweed` v1.0), trained on all of that dataset, [doi:10.5281/zenodo.24164133](https://doi.org/10.5281/zenodo.24164133). Tested on a device it has not seen (leave-one-device-out), the same training reaches an IoU of 0.976 ± 0.007. `dwarph-cv segment` downloads the model on first use and checks its checksum; you can also give it your own weights file.
 
 Installation is described in Section \@ref(build-cv).
+
+## The online hub (optional): DWARPH-hub {#hub-module}
+
+**You do not need the hub to run DWARPH.** A device, the Commander and DWARPH-CV on one computer
+make a complete set-up. The hub is for **large scale**: many devices, several labs or rooms,
+experiments that several people follow, or image analysis that should keep up by itself.
+
+`DWARPH-hub` is a server (one Linux machine, plus an S3-compatible bucket for the images) that:
+
+* **collects** every device's images and their sidecar files from the labs' mirrors, checking each
+  one against the checksum its device recorded. The bucket is the source of truth for images,
+  so the hub's database can be rebuilt from it;
+* **gets them analysed**: DWARPH-CV workers, on any computer with a GPU, take images from the
+  hub's queue, run the ring detection and the segmentation in one pass, and send back the results
+  and the masks. When a new model or ring version is released, every image is analysed again
+  with it, and the old results are kept;
+* **organises experiments as projects**: a table with one row per experiment (a device, a start
+  and an end) and your own typed columns (genotype, treatment, ...), with every change kept as a
+  revision. People are enrolled in a project as viewer, manager or owner;
+* **shows them**: devices or experiments over time, by date or by days since each experiment
+  started, with the images and their masks one click away (Section \@ref(hub)).
+
+It uses the same building blocks as the EntoScan cabinet: FastAPI, Postgres, S3 object storage,
+Authentik for signing in, and Caddy for HTTPS, as docker compose stacks. The repository also
+holds the **local store** (`local/`, formerly DWARPH_DB): a catalogue and timeline viewer for one
+computer, without a server.
+
+Deploying it, and connecting Commanders and workers to it, is described in Section
+\@ref(build-hub).
 
 ## Manuscript {#manuscript-module}
 
