@@ -35,7 +35,7 @@ This walkthrough runs a short, simple experiment end to end. Do it once before d
 
 1. **Put the plants in.** Set the chamber up as you would for a normal growth experiment, and make sure the camera's view of the water surface is unobstructed.
 
-2. **Write a schedule.** Use the [schedule builder](schedule-builder.html) in Appendix \@ref(schedule-builder) --- it is a form that produces a valid file for you, and it will not let you make the common mistakes. For a first run, ask for something short: a two-hour cycle, one repeat, a picture every minute. You want to see it finish, not to learn anything biological from it.
+2. **Write a schedule.** Use the [schedule builder](utilities.html#schedule-builder) in Section \@ref(schedule-builder) --- it is a form that produces a valid file for you, and it will not let you make the common mistakes. For a first run, ask for something short: a two-hour cycle, one repeat, a picture every minute. You want to see it finish, not to learn anything biological from it.
 
 3. **Set the WiFi details.** The device gets its network credentials *from the schedule file*, not from a settings menu. Fill in the network name and password in the builder. If you get these wrong the device will never appear on the network, and the only way to fix it is over USB or by editing the file on the SD card directly --- so check them carefully.
 

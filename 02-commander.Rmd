@@ -41,7 +41,7 @@ To set it up:
 1. On the router, create a 2.4 GHz network with WPA2 and a password, and make sure client
    isolation is off.
 2. Put that network's name and password in each device's schedule (`wifiSSID` and
-   `wifiPassword`; the schedule builder in Appendix \@ref(schedule-builder) has the fields). The
+   `wifiPassword`; the schedule builder in Section \@ref(schedule-builder) has the fields). The
    device joins it when it starts. If they are wrong, the device never appears: check its display,
    or connect it by USB.
 3. Connect the Commander computer to the same router.

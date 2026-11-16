@@ -59,6 +59,6 @@ df <- tibble::tribble(
 knitr::kable(df)
 ```
 
-Each chapter covers one part: the **device** (hardware, firmware and QC), the **Commander**, **DWARPH-CV** and the optional **hub**, then the **publications** and how to get help. The appendices describe running an experiment, the schedule builder and the technical reference.
+Each chapter covers one part: the **device** (hardware, firmware and QC), the **Commander**, **DWARPH-CV** and the optional **hub**, then **utilities** such as the schedule builder, the **publications** and how to get help. The appendices describe running an experiment and the technical reference.
 
 > **This documentation is a work in progress.** The platform is under active development; sections marked *planned* describe intent, not shipped code.

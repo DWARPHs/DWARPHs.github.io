@@ -1,4 +1,8 @@
-# Schedule builder {#schedule-builder}
+# Utilities {#utilities}
+
+Tools that help with DWARPH, in your browser. Nothing you type in them is sent anywhere.
+
+## Schedule builder {#schedule-builder}
 
 This page is a tool, not a description of one. Fill in the form and it writes the schedule file for you, checking as you go for the mistakes that cost people an experiment --- a temperature the hardware will refuse, a light level outside the allowed range, two setpoints at the same time, a device ID that will make the firmware reject the file.
 
@@ -12,7 +16,7 @@ Start from one of the four presets and change the numbers, or build a cycle from
 cat("```{=html}", readLines("assets/schedule-builder.html"), "```", sep = "\n")
 ```
 
-## What to do with the file {-}
+### What to do with the file {-}
 
 Save it as `schedule.json` and put it on the device's SD card, inside a folder named after the device: `<DEVICE_ID>/schedule.json`. If the device is already on the network, you can skip the card and use **Upload Schedule** in the dashboard's Actions tab instead.
 

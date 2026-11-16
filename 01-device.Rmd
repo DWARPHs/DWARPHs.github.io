@@ -167,7 +167,7 @@ df <- tibble::tribble(
   "A temperature reading is missing or implausible", "The cable to the sensor and heater board, and that the board is the right way round.",
   "Heater: the temperature does not rise", "The 12 V supply and the fuse, the heater board's cable, and that the board is not damaged by moisture (coating).",
   "Lights: a colour is missing or the wrong colour lights up", "The LED board's cable and its connector orientation.",
-  "Schedule: NO SCHEDULE", "Not a failure: the device has no schedule yet, so it stays idle (heater and lights off, no pictures). Put a `schedule.json` on the SD card (Appendix \\@ref(schedule-builder)); the camera step then uses its capture light.",
+  "Schedule: NO SCHEDULE", "Not a failure: the device has no schedule yet, so it stays idle (heater and lights off, no pictures). Put a `schedule.json` on the SD card (Section \\@ref(schedule-builder)); the camera step then uses its capture light.",
   "Camera: blurry, dark, or ring not visible", "The camera cable and lens, the focus setting, the camera mount's height, and the capture light in the schedule.",
   "Wi-Fi: no networks found", "The antenna is not connected or damaged.",
   "The tool refuses to mark the device QC'd", "A step failed: fix it and run the check again. `--force` exists for exceptional cases, and the report records that it was used.",
