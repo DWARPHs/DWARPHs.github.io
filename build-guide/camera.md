@@ -19,6 +19,6 @@ it twice: by asking you, and by scanning for networks.
 
 ## SD card {pagestep}
 
-Insert a [microSD card]{Qty: 1} (FAT32 or exFAT) into the slot until it clicks.
+Insert a [microSD card]{Qty: 1} (formatted FAT32: the firmware does not read exFAT) into the slot until it clicks.
 
 > **TODO:** how the XIAO is mounted on the mainboard, and photos.

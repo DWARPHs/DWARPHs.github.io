@@ -20,13 +20,19 @@ plants. It is a Python package (`dwarph_cv`) with one command, `dwarph-cv`:
 picture independently. The mask says where the duckweed is; the ring says where the growing area
 is, and how far and how tilted the camera was. Their combination, the proportion of the area inside
 the ring that the mask covers, is the coverage: one number per picture, and over a run, a growth
-curve. On pictures of devices it was not trained on, the segmentation agrees closely with the
-annotators' masks (Figure \@ref(fig:cv-pipeline)C).
+curve. On pictures of devices it was not trained on, the segmentation's duckweed area agrees
+closely with the annotators' masks (Figure \@ref(fig:cv-pipeline)C; there the area is measured
+on the whole picture, before the ring is applied).
+
+Two limits to keep in mind: coverage is the **area seen from above**, not frond number or biomass,
+and it saturates when the surface closes over and fronds overlap, so growth rates are best
+estimated before that. And the model was trained on one duckweed clone (*Lemna* sp.) in DWARPH
+devices: check it on a few annotated pictures before relying on it for another species or set-up.
 
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:cv-pipeline"></span>
 <img src="assets/cv-pipeline.svg" alt="The image-analysis pipeline: raw image, segmentation, ring detection, ring coverage; an example image with its mask and ring; predicted against true coverage on unseen devices" style="width: 100%; max-width: 1100px;">
-<p class="caption">(\#fig:cv-pipeline) From pictures to growth. **A** The pipeline. Each raw picture (1920 × 1920 pixels, here one every 5 minutes) is analysed twice: the segmentation (a U-Net with a ResNet34 encoder) gives a mask of the duckweed, and the ring detection fits ellipses to the inner and outer edges of the red reference ring and solves the camera's position (its distance and tilt). The ring coverage is the part of the mask inside the ring's inner edge divided by the area inside it; over a run it gives the growth curve (right), on which the picture shown is marked. **B** The same picture, corrected for lens distortion, with the edges of the duckweed mask (blue) and the detected inner edge of the ring (dashed orange); 39.6 % of the ring is covered. **C** How well the segmentation works on pictures of devices it has never seen. The model was trained 7 times, each time leaving one device out, and tested on that device's pictures: each point is one of 13,615 annotated pictures, its coverage measured by the model against the annotators' mask (both as % of the picture; dashed: the 1:1 line). Above the plot: the IoU (intersection over union of the model's and the annotators' masks; 1 = identical) as mean ± standard deviation over the 7 held-out devices, with its range, pooled over all pictures, and the median per picture; the coefficient of variation (CV) of the IoU across devices; and for the coverage, the R² of the model's values against the 1:1 line and the CV of the ratio model ÷ annotation. *(Draft figure for the DWARPH paper.)*</p>
+<p class="caption">(\#fig:cv-pipeline) From pictures to growth. **A** The pipeline. Each raw picture (1920 × 1920 pixels, here one every 5 minutes) is analysed twice: the segmentation (a U-Net with a ResNet34 encoder) gives a mask of the duckweed, and the ring detection fits ellipses to the inner and outer edges of the red reference ring and solves the camera's position (its distance and tilt). The ring coverage is the part of the mask inside the ring's inner edge divided by the area inside it; over a run it gives the growth curve (right), on which the picture shown is marked. **B** The same picture, corrected for lens distortion, with the edges of the duckweed mask (blue) and the detected inner edge of the ring (dashed orange); 39.6 % of the ring is covered. **C** How well the segmentation works on pictures of devices it has never seen. The model was trained 7 times, each time leaving one device out, and tested on that device's pictures: each point is one of 13,615 annotated pictures, its coverage measured by the model against the annotators' mask (both as % of the picture; dashed: the 1:1 line). (The evaluation used the 13,615 annotated pictures that contain duckweed; the published dataset, 13,581 pictures, is the same set after a final curation.) Above the plot: the IoU (intersection over union of the model's and the annotators' masks; 1 = identical) as mean ± standard deviation over the 7 held-out devices, with its range, pooled over all pictures, and the median per picture; the coefficient of variation (CV) of the IoU across devices; and for the coverage, the R² of the model's values against the 1:1 line and the CV of the ratio model ÷ annotation. *(Draft figure for the DWARPH paper.)*</p>
 </div>
 
 ## How to install {#cv-install}
@@ -43,9 +49,24 @@ pip install -e .                 # segmentation, ring reference, worker
 pip install -e '.[train]'        # optional: training
 pip install -e '.[annotate]'     # optional: SAM 2.1 annotator (NVIDIA GPU needed)
 
-dwarph-cv segment --input /path/to/Device_mirror/C4E408 --output preds   # masks + areas.csv
-dwarph-cv ring --root /path/to/Device_mirror/C4E408                       # camera distance and tilt
 ```
+
+From a device's pictures to its growth curve (here device `C4E408`, from the Commander's mirror):
+
+```bash
+M=/path/to/Device_mirror
+dwarph-cv segment --input $M/C4E408 --output preds/C4E408        # masks (<name>_pred.png) + areas.csv
+dwarph-cv ring-coverage --images $M/C4E408 --masks preds/C4E408 --out coverage_C4E408.csv
+dwarph-cv ring --root $M/C4E408                                   # optional: camera distance and tilt
+```
+
+`coverage_C4E408.csv` has one row per picture: `rel_path` (day folder and file name), `timestamp`
+(UTC), `ring_status` (`ok` when the ring was found), `principal_dist_m` (camera distance),
+`ring_area_px` (pixels inside the ring), `plant_px_in_ring` and `plant_px_outside_ring` (duckweed
+pixels), `depth_scale`, and **`ring_coverage`**, the proportion of the ring covered (0--1). Plot
+`ring_coverage` against `timestamp` for the growth curve; while the surface is not yet closed over,
+the slope of its logarithm is the relative growth rate. `areas.csv` (from `segment`) has the
+duckweed area of each whole picture (`area_px`, `area_frac`).
 
 The first run downloads the released model from Zenodo, checks its checksum and keeps it in
 `~/.cache/dwarph_cv/`. `--weights path/to/model.pt` uses your own model instead. `dwarph-cv --help`

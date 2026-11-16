@@ -69,8 +69,8 @@
   </a>
   <a href="https://github.com/DWARPHs/DWARPH-hub" target="_blank" rel="noopener">
   <title>DWARPH-hub: https://github.com/DWARPHs/DWARPH-hub</title>
-  <rect class="planned" x="985" y="70" width="235" height="150" rx="12"/>
-  <text class="tag tag-planned" x="1001" y="92">OPTIONAL</text>
+  <rect class="repo" x="985" y="70" width="235" height="150" rx="12"/>
+  <text class="tag tag-repo" x="1001" y="92">OPTIONAL</text>
   <text class="t" x="1001" y="111">DWARPH-hub</text>
   <text class="s" x="1001" y="133">one server for many</text>
   <text class="s" x="1001" y="152">labs: images, analysis,</text>
@@ -79,8 +79,8 @@
   </a>
   <a href="https://github.com/DWARPHs/DWARPH-CV" target="_blank" rel="noopener">
   <title>GPU computer: https://github.com/DWARPHs/DWARPH-CV</title>
-  <rect class="planned" x="985" y="290" width="235" height="110" rx="12"/>
-  <text class="tag tag-planned" x="1001" y="312">OPTIONAL</text>
+  <rect class="repo" x="985" y="290" width="235" height="110" rx="12"/>
+  <text class="tag tag-repo" x="1001" y="312">OPTIONAL</text>
   <text class="t" x="1001" y="331">GPU computer</text>
   <text class="s" x="1001" y="353">analyses the hub&#x27;s images</text>
   <text class="m" x="1001" y="372">dwarph-cv worker</text>

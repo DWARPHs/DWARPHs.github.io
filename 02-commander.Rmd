@@ -39,7 +39,10 @@ Commander computer connected to it. Institute and guest networks often block wha
 To set it up:
 
 1. On the router, create a 2.4 GHz network with WPA2 and a password, and make sure client
-   isolation is off.
+   isolation is off. Give it **internet access** if you can: the devices set their clocks from
+   internet time servers (NTP). Without internet, a device's clock runs on from its last
+   correction, kept by its battery; make sure each device has had internet access at least once
+   before an experiment.
 2. Put that network's name and password in each device's schedule (`wifiSSID` and
    `wifiPassword`; the schedule builder in Section \@ref(schedule-builder) has the fields). The
    device joins it when it starts. If they are wrong, the device never appears: check its display,
@@ -73,6 +76,21 @@ device's ID, temperature and setpoint, light levels, uptime, scheduler state and
 Opening a card gives the live stream, the actions (upload a schedule, start, stop, restart,
 files on the SD card, firmware update) and a debug log. Without hardware at hand, the **Mock
 Device** switch shows a demonstration card.
+
+Three more tools matter for experiments:
+
+* **File Sync** (toolbar) --- copies every device's SD card into the **device mirror**
+  (`device_mirror/<DEVICE_ID>/<YYYY_MM_DD>/...`) while the devices run. Each picture is checked
+  against the checksum its device recorded, finished days are checked against the device's record
+  of that day, and nothing is deleted from the mirror when it disappears from a card. **Files**
+  opens the mirror, with its verification state. This is the normal way to collect the pictures
+  (Appendix \@ref(data)).
+* **Camera tuning** (per device) --- live preview with focus, gain, exposure and the **capture
+  light** the pictures are taken under.
+* **Light calibration** --- with a PAR meter at the plants' level, the Commander steps each
+  colour through its range, measures it, and uploads a calibration table to the device, so that a
+  light level in a schedule means the same fraction of a device's measured maximum on every
+  device. It also compares devices with each other.
 
 Running an experiment --- writing a schedule, starting it, watching it and collecting the
 pictures --- is described in Appendix \@ref(manual).

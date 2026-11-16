@@ -53,7 +53,8 @@ Each lab's Commander sends its device mirror to the hub with a **machine account
    \@ref(hub-users)).
 2. On the lab's computer, put its credentials in `~/.config/dwarph/hub.json` (readable only by you):
    `{"issuer": "https://auth.example.org/application/o/dwarph-commander/", "client_id": "dwarph-commander", "username": "...", "password": "..."}`.
-3. Send the mirror:
+3. Send the mirror, with `tools/push_mirror.py` from the
+   [DWARPH-hub](https://github.com/DWARPHs/DWARPH-hub) repository (Python standard library only):
 
 ```bash
 python tools/push_mirror.py --hub https://hub.example.org --credentials ~/.config/dwarph/hub.json \
@@ -85,6 +86,10 @@ knitr::kable(df)
 start and an end) and columns for what differs between them. A project is seen only by its
 **members**, each with a role in it: **viewer** (sees it), **manager** (also edits the table) or
 **owner** (also enrols people). Whoever creates a project owns it.
+
+What is private is the **project** (its table and history), **not the pictures**: everyone with a
+role on the hub sees every device's pictures and analysis under *All*. On a hub shared between
+labs, keep this in mind, or run one hub per group.
 
 **Pictures and results.** The pictures are stored in the bucket exactly as on the SD cards
 (`raw/<device>/<day>/<name>.jpg` with its `.json` sidecar), so the hub can always be rebuilt from

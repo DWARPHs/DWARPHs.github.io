@@ -8,7 +8,7 @@ This appendix is written for the person running the experiment, with devices and
 
 A DWARPH device is a small growth chamber that looks after itself. You tell it what conditions to hold and how often to photograph the plants, and it does that unattended for days or weeks, saving every image and every measurement.
 
-You describe the experiment in one file, called a **schedule**. A schedule says things like *"start at 16 °C in dim red light, warm to 25 °C by midday under full light, cool to 10 °C overnight, and repeat that for seven days, taking a picture every ten minutes."* You write that once, copy it to the device, and press start.
+You describe the experiment in one file, called a **schedule**. A schedule says things like *"start at 18 °C in dim red light, warm to 25 °C by midday under full light, cool back to 18 °C overnight, and repeat that for seven days, taking a picture every ten minutes"* (in a room at 18 °C or cooler, since the device only heats). You write that once, copy it to the device, and press start.
 
 Because a single device is inexpensive, the platform is built on the assumption that you will run **several at once** --- replicates of a treatment, or several treatments side by side. Each device runs its own schedule independently; the dashboard on your laptop simply gives you one window onto all of them.
 
@@ -22,28 +22,28 @@ You will need:
 
 * One or more **assembled DWARPH devices**, flashed and QC'd (Chapter \@ref(device))
 * An **SD card** in each device
-* A **WiFi network** the devices can join, and a laptop on that same network
+* A **Wi-Fi network** the devices can join, and a laptop on that same network
 * The **Commander** installed on that laptop (Section \@ref(commander-setup))
 
 One thing worth knowing before you design anything: **the device heats, but it does not actively cool.** It can hold a temperature above the room it sits in, and it reaches lower temperatures by simply not heating. In practice that means the coldest point in your schedule cannot go below the ambient temperature of the room, and a "night" of 10 °C is only achievable in a room that is already at or below 10 °C. Plan your room temperature around the *lowest* temperature your experiment needs.
 
-<!-- TODO: confirm cooling behaviour with the hardware team, and give the real achievable range relative to ambient. -->
+The lights also warm the chamber, so with the lights on the lowest temperature a device can hold is probably a little above the room's. How much has not been measured yet: until it has, check the logged temperature against the setpoint in a short test run in your room.
 
 ## Your first experiment {#first-experiment}
 
-This walkthrough runs a short, simple experiment end to end. Do it once before designing anything real --- it takes about an hour and shakes out network and hardware problems while they are still cheap to fix.
+This walkthrough runs a short, simple experiment end to end. Do it once before designing anything real --- it takes two to three hours and shakes out network and hardware problems while they are still cheap to fix.
 
 1. **Put the plants in.** Set the chamber up as you would for a normal growth experiment, and make sure the camera's view of the water surface is unobstructed.
 
 2. **Write a schedule.** Use the [schedule builder](utilities.html#schedule-builder) in Section \@ref(schedule-builder) --- it is a form that produces a valid file for you, and it will not let you make the common mistakes. For a first run, ask for something short: a two-hour cycle, one repeat, a picture every minute. You want to see it finish, not to learn anything biological from it.
 
-3. **Set the WiFi details.** The device gets its network credentials *from the schedule file*, not from a settings menu. Fill in the network name and password in the builder. If you get these wrong the device will never appear on the network, and the only way to fix it is over USB or by editing the file on the SD card directly --- so check them carefully.
+3. **Set the Wi-Fi details.** The device gets its network credentials *from the schedule file*, not from a settings menu. Fill in the network name and password in the builder. If you get these wrong the device will never appear on the network, and the only way to fix it is over USB or by editing the file on the SD card directly --- so check them carefully.
 
 4. **Get the schedule onto the device.** Two ways:
-   * *Over the network*, once the device is already on WiFi: in the Commander, open the device, go to the **Actions** tab, and use **Upload Schedule**.
+   * *Over the network*, once the device is already on Wi-Fi: in the Commander, open the device, go to the **Actions** tab, and use **Upload Schedule**.
    * *Directly on the card*, which is how the first schedule usually gets there: put the SD card in your computer and save the file as `<DEVICE_ID>/schedule.json`. Section \@ref(device-id) explains what `<DEVICE_ID>` is and where to find it.
 
-5. **Power the device up.** It joins the WiFi network, sets its clock, and begins running the schedule. The small display on the device shows its status and current readings, so you can confirm it is alive without a computer.
+5. **Power the device up.** It joins the Wi-Fi network, sets its clock, and begins running the schedule. The small display on the device shows its status and current readings, so you can confirm it is alive without a computer.
 
 6. **Open the Commander.** Devices appear on their own within a few seconds --- you do not have to enter addresses or scan for anything. Each device becomes a card showing its ID, current temperature and setpoint, light levels, uptime, scheduler state, and the most recent photograph.
 
@@ -98,7 +98,7 @@ You can choose how it fills in the gaps:
 knitr::include_graphics("assets/placeholder-schedule.svg")
 ```
 
-Three settings then control the shape of the experiment as a whole:
+Four settings then control the shape of the experiment as a whole:
 
 * **Cycle length** (`loopTime`) --- how long one repeat lasts. Use 24 hours for a normal day/night cycle. Shorter or longer cycles are perfectly possible if that is what you are studying.
 * **Time unit** (`timeUnit`) --- whether the numbers in the schedule are `hours`, `minutes` or `seconds`. Hours is natural for a daily cycle; switch to minutes or seconds when you want fine detail, such as a brief light pulse.
@@ -111,13 +111,31 @@ The interval sets how much temporal detail you get, and how much data you have t
 
 Bear in mind that images accumulate on the SD card and that a full card ends the recording, so pick the largest interval that still resolves what you care about, and check the card has room for the whole run before you start.
 
-<!-- TODO: give the typical image file size and a table of card capacity vs. interval and run length. -->
+A picture and its metadata take about **0.4 MB**:
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~"Interval", ~"Per day", ~"Per week", ~"A 32 GB card lasts",
+  "5 min", "≈ 115 MB", "≈ 0.8 GB", "≈ 8 months",
+  "10 min", "≈ 58 MB", "≈ 0.4 GB", "over a year",
+  "30 min", "≈ 19 MB", "≈ 0.13 GB", "years"
+)
+knitr::kable(df)
+```
+
+**Pictures at night are light pulses.** Each picture is taken under the device's *capture light*
+(a per-device camera setting, by default white at 10 %, set in the Commander's camera tuning
+window), whatever the schedule's lights are at that moment. At night, that means a brief light
+pulse at every picture. For growth this is negligible as light, but for the plant's light
+signalling it is not: a light pulse in the night (a *night break*) is the classic way to change
+photoperiod responses, such as flowering or turion formation, and it can shift the circadian
+clock. For experiments on photoperiod, dormancy or rhythms, avoid pictures in the dark periods or
+make them rare; for growth experiments, say in your methods how often pictures were taken at
+night, and under which capture light.
 
 ### Light channels {-}
 
-Brightness is set separately for **red**, **blue** and **white**, each on a scale from 0 (off) to 1 (full). Darkness is all three at 0. Note that these are *drive levels*, not photon flux --- if you need to report actual intensity, measure it with a light meter in the chamber rather than reporting the numbers from the schedule.
-
-<!-- TODO: add a measured conversion from drive level to PPFD at plant level. -->
+Brightness is set separately for **red**, **blue** and **white**, each on a scale from 0 (off) to 1 (full). Darkness is all three at 0. These are *levels*, not photon flux. With the Commander's **light calibration** (Section \@ref(commander-setup)), measured with a PAR meter at the plants' level, a level means the same fraction of each device's maximum light on every device; without it, it is a raw drive level. Either way, report light as you measured it (µmol m⁻² s⁻¹ at the plants, per channel), not as the numbers in the schedule. A published table from level to PPFD for the standard build does not exist yet.
 
 ### Temperature limits {-}
 
@@ -135,7 +153,7 @@ The firmware refuses temperatures outside **10--50 °C**, whatever the schedule 
 
 By default, times in the schedule are **relative**: hour 0 is when the device starts running the schedule. This is what you usually want, since it means the same file can be reused on any device on any day.
 
-If you need several devices to be synchronised to real wall-clock time --- so that "midday" happens simultaneously across all of them --- use **absolute** times instead, given as `YYYY_MM_DD HH_mm_SS`. The devices synchronise their clocks over the network, so this works even though they were switched on at different moments.
+If you need several devices to be synchronised to real wall-clock time --- so that "midday" happens simultaneously across all of them --- use **absolute** times instead, given as `YYYY_MM_DD HH_mm_SS`. Each device keeps time on a battery-backed clock and corrects it from internet time servers every 15 minutes when its network has internet access, so this works even though the devices were switched on at different moments. On a network without internet, the clocks run on from their last correction (Section \@ref(network)).
 
 Two things to watch with absolute time. It is interpreted as **UTC**, not your local time, so if you are anywhere other than the UK in winter you must offset your times by hand --- and remember that summer time will shift your experiment relative to the building's own lighting. And if you set `totalLoops` to anything other than 1, the date part is ignored and the schedule is treated as a 24-hour loop.
 
@@ -145,7 +163,7 @@ Two things to watch with absolute time. It is interpreted as **UTC**, not your l
 
 ## Watching an experiment run {#running}
 
-Once started, a device is autonomous: it keeps running the schedule, recording images and logging measurements whether or not your laptop is on, whether or not the Commander is open, and whether or not the WiFi is working. The dashboard is a window onto the experiment, not a part of it.
+Once started, a device is autonomous: it keeps running the schedule, recording images and logging measurements whether or not your laptop is on, whether or not the Commander is open, and whether or not the Wi-Fi is working. The dashboard is a window onto the experiment, not a part of it.
 
 Opening a device from its card gives you:
 
@@ -165,7 +183,7 @@ If you have no hardware to hand and just want to see how the interface works, tu
 
 ## Getting your data {#data}
 
-Images and logs are written to the **SD card**, in a folder named after the device ID. The card is the authoritative copy: the thumbnails in the Commander are for monitoring, not for analysis.
+Images and logs are written to the **SD card**, in a folder named after the device ID. The card holds the original of everything; the thumbnails in the Commander are for monitoring, not for analysis.
 
 ```{r timelapse, echo=FALSE, fig.cap="The output of a run: here one image per hour of a week-long run (device `C4E408`)."}
 knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
@@ -173,22 +191,24 @@ knitr::include_graphics("assets/duckweed_timelapse_C4E408.webp")
 
 To measure the plants in these images, see DWARPH-CV (Chapter \@ref(cv)). If your institute runs a DWARPH hub, the images are also there, already measured (Chapter \@ref(hub)).
 
-At the end of a run, take the card out and copy the folder off it. You can also pull files over the network through the Commander, which is convenient for spot-checks mid-experiment but slower for an entire run.
+**Collect the pictures with the Commander's File Sync** (Section \@ref(commander-setup)): it copies every device's card into the device mirror while the run goes on, checks every picture against its checksum, and shows which days are complete. At the end of a run, check in **Files** that every day is verified. Keep the SD card as it is until then: it is the original, and copying a folder off the card in a computer is the fallback if a device was never on the network.
+
+On the card and in the mirror, each picture is `<DEVICE_ID>/<YYYY_MM_DD>/<YYYYMMDD_HHMMSS>_Focus_<f>_Gain_<g>_Exposure_<e>.jpg` (UTC), with a `.json` file of the same name next to it: the picture's checksum and size, its time (`timestamp.utc_us`, microseconds since 1970, UTC), the camera settings, the measured and set temperature and the heater output, the scheduled light and the capture light, and the schedule's name and point. Folders named `2000_01_01` hold pictures taken before the device's clock was set.
 
 Keep the schedule file with the images. It is the record of what conditions the plants actually experienced, and in six months it will be the only thing that tells you what device `XYZABC` was doing.
 
-<!-- TODO: document the log file format and the image file naming convention. -->
+<!-- TODO: document the log file format. -->
 
 ## When something goes wrong {#troubleshooting}
 
 ```{r, echo=FALSE}
 df <- tibble::tribble(
   ~Symptom, ~"Most likely cause and fix",
-  "No devices appear in the Commander at all", "Your laptop and the devices are on different networks, or the network blocks device discovery (common on university and guest WiFi). Try a simple router or a phone hotspot to confirm. Discovery runs automatically — there is no button to press.",
-  "One device is missing, the others are fine", "Wrong WiFi name or password in that device's schedule file. The device cannot tell you this over a network it never joined — check its display, or connect it by USB.",
-  "A card appears but the readings never update", "The live readings come from the optional telemetry service. If it is not set up, the card will look static — the device is still running normally. See Section \\@ref(mqtt).",
+  "No devices appear in the Commander at all", "Your laptop and the devices are on different networks, or the network blocks device discovery (common on university and guest Wi-Fi). Try a simple router or a phone hotspot to confirm. Discovery runs automatically — there is no button to press.",
+  "One device is missing, the others are fine", "Wrong Wi-Fi name or password in that device's schedule file. The device cannot tell you this over a network it never joined — check its display, or connect it by USB.",
+  "A card appears but the readings never update", "The live readings come from the optional MQTT broker. If it is not running, the card will look static — the device is still running normally. See Section \\@ref(network).",
   "Temperature never reaches the setpoint", "Most often the target is below room temperature: the device cannot cool. Otherwise check the heater and that the lid is closed.",
-  "Images are dark or out of focus", "Check the light channels are not all at 0 at that point in the schedule, and use the live stream to confirm framing and focus.",
+  "Images are dark or out of focus", "Pictures are taken under the capture light, not the schedule's light: check it, and the focus, in the Commander's camera tuning window, and use the live stream to confirm framing.",
   "New images stop partway through a run", "The SD card is full, or was removed. Check the free space before a long run.",
   "The schedule does not seem to have changed after upload", "Uploading a file does not restart a run in progress. Reset or restart the scheduler from the Actions tab."
 )

@@ -27,7 +27,8 @@ The design files are in [DWARPH-hardware](https://github.com/DWARPHs/DWARPH-hard
   files (Gerbers, bill of materials, pick-and-place):
   * the **mainboard**, carrying the ESP32-S3 module (developed with the Seeed Studio XIAO ESP32S3
     Sense) with its camera connector, the real-time clock and its CR1220 battery, and the SD card;
-  * the **12 V distribution board**;
+  * the **12 V distribution board**, one for up to 10 devices (it feeds them from one power
+    supply through fused outputs);
   * the **LED board**, driving the red, blue and white channels (NXP PCA9955B);
   * the **temperature sensor and heater board** (TI TMP119), which has to be coated before use;
 * **3D-printed parts**: the chamber body, the camera mount and the reference ring, as editable
@@ -35,8 +36,10 @@ The design files are in [DWARPH-hardware](https://github.com/DWARPHs/DWARPH-hard
 * **off-the-shelf parts**: screws, cables, connectors, the OV5640 camera, the power supply, with
   their datasheets.
 
-The device **heats but does not cool**: it holds temperatures between the room's and 50 °C
-(the firmware refuses anything outside 10--50 °C).
+The device **heats but does not cool**: it cannot hold a temperature below that of the room, and
+the firmware refuses setpoints outside 10--50 °C. The lights also warm the chamber, so with the
+lights on the lowest temperature it can hold is probably somewhat above the room's; this has not
+been measured yet (Appendix \@ref(checklist)).
 
 ### Building instructions {- #build-instructions}
 
@@ -60,12 +63,18 @@ project for the ESP32-S3. Its main parts:
 * **Light controller** (`main/light_contoroller.hpp`, `main/led_board`) --- drives the red, blue
   and white channels, each from 0.0 to 1.0.
 * **Camera** (`main/camera.h`) --- time-lapse capture at the schedule's interval, with automatic
-  or fixed focus (a modified OV5640 autofocus driver is included).
+  or fixed focus (a modified OV5640 autofocus driver is included). Each picture is taken under a
+  **capture light**, a per-device camera setting (by default white at 10 %), set in the
+  Commander's camera tuning window. At night this is a short light pulse for the plants
+  (Appendix \@ref(schedules)).
 * **Storage and logging** (`main/sd_card.h`, `main/logger_task`) --- every picture is written to
   the SD card with a sidecar file of the conditions it was taken in and its checksum, in a
   folder named after the device.
 * **Network** --- Wi-Fi, a REST API, MQTT telemetry and mDNS announcement
-  (Appendix \@ref(reference)); time from the real-time clock and the network.
+  (Appendix \@ref(reference)).
+* **Clock** --- a battery-backed real-time clock keeps the time; when the device's network has
+  internet access, it is corrected from internet time servers (NTP) every 15 minutes. All times
+  are UTC.
 * **QC** --- the check of a new device (Section \@ref(qc)).
 
 A device takes its settings (Wi-Fi network, picture interval, broker) from its schedule, so the
@@ -73,7 +82,7 @@ same firmware is flashed on every device.
 
 ### How to flash {- #flash}
 
-You need ESP-IDF (version 4.1 or newer), set up as in the
+You need **ESP-IDF 5.0 or newer**, set up as in the
 [Espressif getting-started guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html),
 a USB cable, and on Linux permission to use the serial port (usually the `dialout` group).
 The components the firmware uses (`espressif/esp32-camera`, `espressif/mdns`,
@@ -83,13 +92,15 @@ The components the firmware uses (`espressif/esp32-camera`, `espressif/mdns`,
 git clone https://github.com/DWARPHs/DWARPH-firmware.git
 cd DWARPH-firmware
 
-idf.py set-target esp32s3
+idf.py set-target esp32s3        # once, in a fresh clone
 idf.py build
-idf.py -p <PORT> flash monitor
+idf.py -p <PORT> erase-flash flash monitor
 ```
 
 `<PORT>` is the device's serial port: `/dev/ttyACM0` or `/dev/ttyUSB0` on Linux, `COM3` or
-similar on Windows. Leave out `monitor` if you do not want the serial console; `Ctrl+]` leaves it.
+similar on Windows. `erase-flash` clears the device's memory, for a clean start on a new device;
+leave it out to keep the stored settings when re-flashing. Leave out `monitor` if you do not want
+the serial console; `Ctrl+]` leaves it.
 
 A device that is already running can be updated over the network (the Commander's firmware
 update, or the `/api/firmware/upload` endpoint). An update keeps the device's QC record; a full
@@ -99,14 +110,21 @@ erase (`idf.py erase-flash`) clears it, and the device has to be QC'd again.
 
 ### Overview {- #qc-overview}
 
-Every newly built and flashed device is checked before it runs an experiment. The check is
-part of the firmware and is done at the bench, **over the USB cable only**: no Wi-Fi, no
-network.
+> **Status: not usable on a device yet.** The QC tool, `dwarph_qc.py`, is written and tested
+> against a simulated device, on the firmware's
+> [`dwarph-qc`](https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc) branch.
+> The firmware side (the NOT QC'D state and the commands the tool sends) is **not written yet**, so
+> a device built today does not have the QC gate and does not answer the tool. Until it does,
+> check a new device by hand with the steps below and run a short first experiment
+> (Appendix \@ref(first-experiment)).
 
-Until it has passed, a device shows **NOT QC'D** in large letters on its display, its lights
-**flash dimly red, blue and white** in turn so that it is visible across the room, and its
-heater stays off. It does nothing else. The check, `dwarph_qc.py`, goes through every part of
-the device and asks you to confirm what only a person can see:
+QC is the check of every newly built and flashed device before it runs an experiment. It is part
+of the firmware and done at the bench, **over the USB cable only**: no Wi-Fi, no network.
+
+Once the firmware side is in place, a device that has not passed will show **NOT QC'D** in large
+letters on its display, its lights will **flash dimly red, blue and white** in turn so that it is
+visible across the room, and its heater will stay off. The check goes through every part of the
+device and asks you to confirm what only a person can see:
 
 ```{r, echo=FALSE}
 df <- tibble::tribble(
@@ -130,19 +148,18 @@ picture) and asks whether to **mark the device as QC'd**. The device then stores
 date, operator, firmware version and the report's fingerprint --- and restarts into normal
 operation.
 
-*Status: the QC tool is written and tested against a simulated device; the firmware side (the
-NOT QC'D state and the commands the tool sends) is being implemented on the firmware's
-[`dwarph-qc`](https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc/tools/dwarph_qc) branch.*
-
 ### Run QC {- #run-qc}
 
 Connect the freshly flashed device by USB, then:
 
 ```bash
 cd DWARPH-firmware
+git checkout dwarph-qc                     # the tool is on this branch
 pip install pyserial pillow numpy          # once
 python tools/dwarph_qc/dwarph_qc.py        # finds the device on USB and starts
 ```
+
+*(This needs the firmware side, see the status above; until then, use the simulator below.)*
 
 Answer each question as the tool goes. The physical checklist is
 `tools/dwarph_qc/physical_checklist.json`: edit it to match your build (each item is either a
@@ -163,7 +180,7 @@ df <- tibble::tribble(
   ~Problem, ~"What to check",
   "The tool does not find the device", "A USB cable that carries data (some only charge), the device powered, and on Linux permission to use the port (`dialout` group). Pass the port explicitly if several boards are connected.",
   "Clock: the clock had lost power", "The CR1220 battery is missing, flat or in the wrong way round. Fit a new one and run QC again.",
-  "SD card: too little space or too slow", "Use a card with at least 4 GB free and a write speed of at least 0.5 MB/s, formatted FAT32.",
+  "SD card: too little space or too slow", "Use a card with at least 4 GB free and a write speed of at least 0.5 MB/s, formatted FAT32 (the firmware does not read exFAT).",
   "A temperature reading is missing or implausible", "The cable to the sensor and heater board, and that the board is the right way round.",
   "Heater: the temperature does not rise", "The 12 V supply and the fuse, the heater board's cable, and that the board is not damaged by moisture (coating).",
   "Lights: a colour is missing or the wrong colour lights up", "The LED board's cable and its connector orientation.",

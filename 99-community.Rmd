@@ -13,7 +13,7 @@ If something is broken or you are stuck, the best thing you can do is **open an 
 
 An issue is more useful than an email: it is searchable, and the next person with the same problem finds the answer.
 
-When reporting a device problem, it helps a great deal to include the firmware version, the device's `schedule.json` (with WiFi credentials removed), and the relevant part of the serial monitor or the Commander's `Debug` log.
+When reporting a device problem, it helps a great deal to include the firmware version, the device's `schedule.json` (with Wi-Fi credentials removed), and the relevant part of the serial monitor or the Commander's `Debug` log.
 
 ## Contributing {-}
 

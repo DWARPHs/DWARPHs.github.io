@@ -67,8 +67,9 @@ cr1220:
 microsd:
     Name: microSD card, 32 GB
     Description: >
-        Holds the pictures, their metadata, the logs and the schedule. 32 GB holds weeks of
-        pictures at one every few minutes. FAT32 or exFAT.
+        Holds the pictures, their metadata, the logs and the schedule. A picture is about 0.4 MB,
+        so 32 GB holds about 8 months at one every 5 minutes. Format it FAT32 (the firmware does
+        not read exFAT).
 
 psu_12v:
     Name: 12 V power supply

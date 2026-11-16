@@ -32,6 +32,11 @@ df <- tibble::tribble(
 knitr::kable(df)
 ```
 
+The **capture light** (the light each picture is taken under) is not a schedule field: it is a
+per-device camera setting (`captureLight` in `/api/camera/settings`: red, blue and white levels),
+by default white at 10 %, and is set in the Commander's camera tuning window. It is recorded in
+every picture's metadata (`light.captured`).
+
 ### Setpoint fields {-}
 
 ```{r, echo=FALSE}

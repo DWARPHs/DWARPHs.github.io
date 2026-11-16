@@ -1,6 +1,6 @@
 # How DWARPH devices, the router, the Commander and (optionally) the hub connect.
 #   python scripts/make_project_map.py --spec figures/network-map.yml --out assets/network-map.svg
-# Same format as project-map.yml. Dashed boxes are optional.
+# Same format as project-map.yml. The OPTIONAL tag marks what a set-up can do without.
 title: How DWARPH devices, the Commander and the hub connect
 canvas: {width: 1250, height: 430}
 columns:
@@ -60,7 +60,7 @@ nodes:
 
   hub:
     link: https://github.com/DWARPHs/DWARPH-hub
-    kind: planned
+    kind: repo
     tag: OPTIONAL
     box: [985, 70, 235, 150]
     items:
@@ -72,7 +72,7 @@ nodes:
 
   worker:
     link: https://github.com/DWARPHs/DWARPH-CV
-    kind: planned
+    kind: repo
     tag: OPTIONAL
     box: [985, 290, 235, 110]
     items:
