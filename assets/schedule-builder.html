@@ -41,13 +41,9 @@
 </style>
 <div class="sb-card">
 <h4>1. The experiment</h4>
-<p class="sb-hint">What this run is called, which chamber it may run on, and how the device gets onto the network.</p>
+<p class="sb-hint">What this run is called and how often the device takes a picture. The device's own set-up (its network, focus and light calibration) is not part of a schedule: it is in the device's <code>config.json</code>.</p>
 <div class="sb-grid">
 <div class="sb-f"><label for="sb-name">Schedule name</label><input type="text" id="sb-name" value="Day-night cycle"><small>Your label for this experiment.</small></div>
-<div class="sb-f"><label for="sb-dev">Runs on</label><select id="sb-dev"><option value="all">Any device (all)</option><option value="one">One specific device</option></select><small>"all" lets any chamber run this file.</small></div>
-<div class="sb-f" id="sb-devid-wrap" style="display:none"><label for="sb-devid">Device ID</label><input type="text" id="sb-devid" placeholder="8EF248"><small>The MAC suffix, upper case. Shown on the device display and in the dashboard.</small></div>
-<div class="sb-f"><label for="sb-ssid">WiFi network</label><input type="text" id="sb-ssid" placeholder="MyNetwork"><small>Exactly as it appears; case matters.</small></div>
-<div class="sb-f"><label for="sb-pw">WiFi password</label><input type="text" id="sb-pw" placeholder="password"><small>Stored unencrypted in the file.</small></div>
 <div class="sb-f"><label for="sb-interval">Photograph every (minutes)</label><input type="number" id="sb-interval" value="10" min="1" step="1"><small>Smaller means more detail and far more data.</small></div>
 </div>
 </div>
@@ -80,23 +76,6 @@
 </div>
 <div class="sb-row"><button type="button" class="sb-btn" id="sb-add">+ Add setpoint</button><button type="button" class="sb-btn" id="sb-sort">Sort by time</button></div>
 </div>
-<div class="sb-card">
-<h4>4. Camera focus</h4>
-<div class="sb-grid">
-<div class="sb-f"><label for="sb-focus">Focus mode</label><select id="sb-focus"><option value="Auto">Auto — refocus each capture</option><option value="Manual">Manual — fixed position</option></select></div>
-<div class="sb-f" id="sb-focusval-wrap" style="display:none"><label for="sb-focusval">Focus position</label><input type="number" id="sb-focusval" value="128" min="0" max="255" step="1"><small>0 is far, 255 is close.</small></div>
-</div>
-</div>
-<details>
-<summary>5. Live telemetry (optional)</summary>
-<p class="sb-hint" style="margin-top:0">Only needed if you want the dashboard cards to update once a second. Leave the broker blank and the device still works normally over its REST interface.</p>
-<div class="sb-grid">
-<div class="sb-f"><label for="sb-broker">Broker address</label><input type="text" id="sb-broker" placeholder="mqtt://192.168.1.50:1883"></div>
-<div class="sb-f"><label for="sb-muser">Username</label><input type="text" id="sb-muser" placeholder="optional"></div>
-<div class="sb-f"><label for="sb-mpw">Password</label><input type="text" id="sb-mpw" placeholder="optional"></div>
-<div class="sb-f"><label for="sb-prefix">Topic prefix</label><input type="text" id="sb-prefix" placeholder="dwraph/v1/devices"><small>Leave blank for the firmware default.</small></div>
-</div>
-</details>
 <div class="sb-card">
 <h4>Preview</h4>
 <p class="sb-hint">What the chamber will actually do over one cycle.</p>
@@ -153,38 +132,22 @@
   function build(){
     var pts=points();
     var c={};
-    c.deviceID=$('sb-dev').value==='all'?'all':$('sb-devid').value.trim();
     c.scheduleName=$('sb-name').value.trim();
     c.interpolation=$('sb-interp').value;
     c.timeType=$('sb-timetype').value;
     c.timeUnit=$('sb-unit').value;
     if(!abs()){c.startTime=num($('sb-start').value);}
-    c.wifiSSID=$('sb-ssid').value;
-    c.wifiPassword=$('sb-pw').value;
     c.imageIntervalMin=num($('sb-interval').value);
     if(!abs()){c.loopTime=num($('sb-loop').value);}
     c.totalLoops=$('sb-forever').checked?-1:num($('sb-loops').value);
-    c.focusMode=$('sb-focus').value;
-    if(c.focusMode==='Manual'){c.focusValue=num($('sb-focusval').value);}
-    var broker=$('sb-broker').value.trim();
-    if(broker){
-      c.mqttBrokerUri=broker;
-      if($('sb-muser').value.trim()){c.mqttUsername=$('sb-muser').value.trim();}
-      if($('sb-mpw').value.trim()){c.mqttPassword=$('sb-mpw').value.trim();}
-      if($('sb-prefix').value.trim()){c.mqttTopicPrefix=$('sb-prefix').value.trim();}
-    }
     c.schedule=pts.map(function(p){
       return {name:p.name,description:p.desc,time:abs()?p.traw:p.t,temperature:p.T,light:{red:p.r,blue:p.b,white:p.w}};
     });
-    return {scheduleConfig:c};
+    return c;
   }
   function check(){
-    var m=[],pts=points(),c=build().scheduleConfig;
-    if($('sb-dev').value!=='all'&&!c.deviceID){m.push(['e','Give a device ID, or set "Runs on" back to any device. A schedule with the wrong ID is refused by the firmware.']);}
-    if($('sb-dev').value!=='all'&&c.deviceID&&!/^[0-9A-F]{6}$/.test(c.deviceID)){m.push(['w','A device ID is normally six upper-case hexadecimal characters, like 8EF248. "'+c.deviceID+'" does not look like one, and the match is case-sensitive.']);}
+    var m=[],pts=points(),c=build();
     if(!c.scheduleName){m.push(['w','Give the schedule a name — it is how you will recognise this run later.']);}
-    if(!c.wifiSSID){m.push(['e','WiFi network name is required. Without it the device never joins the network and cannot be reached.']);}
-    if(!c.wifiPassword){m.push(['w','WiFi password is empty. That is only right for an open network.']);}
     if(!(c.imageIntervalMin>0)){m.push(['e','The photograph interval must be greater than 0 minutes.']);}
     if(!pts.length){m.push(['e','Add at least one setpoint — the schedule has nothing to do.']);}
     if(pts.length===1){m.push(['w','With a single setpoint the conditions never change. Add a second one if you meant to hold constant conditions across the cycle.']);}
@@ -212,7 +175,6 @@
       } else {m.push(['e','The cycle length must be greater than 0.']);}
       if(c.totalLoops!==-1&&!(c.totalLoops>0)){m.push(['e','The number of cycles must be a positive whole number, or use "repeat forever".']);}
     }
-    if(c.focusMode==='Manual'&&(c.focusValue===null||c.focusValue<0||c.focusValue>255)){m.push(['e','A manual focus position must be a whole number between 0 and 255.']);}
     var coldest=Math.min.apply(null,pts.map(function(p){return p.T===null?99:p.T;}));
     if(coldest<18&&coldest<99){m.push(['w','The coldest point in this schedule is '+coldest+' °C. The device heats but cannot cool, so it will only reach that if the room itself is at or below '+coldest+' °C.']);}
     if(c.imageIntervalMin>0&&c.loopTime>0&&c.totalLoops>0&&c.timeUnit==='hours'){
@@ -290,7 +252,7 @@
     var ul=$('sb-msgs');ul.innerHTML='';
     var m=check();
     var errs=m.filter(function(x){return x[0]==='e';});
-    if(!errs.length){var li=document.createElement('li');li.className='sb-ok';li.textContent='This schedule looks valid. Download it and put it on the SD card as <DEVICE_ID>/schedule.json, or upload it from the dashboard.';ul.appendChild(li);}
+    if(!errs.length){var li=document.createElement('li');li.className='sb-ok';li.textContent='This schedule looks valid. Download it and put it on the SD card as <DEVICE_ID>/schedule.json (replacing the one there), or upload it from the Commander.';ul.appendChild(li);}
     m.forEach(function(x){
       var li=document.createElement('li');
       li.className=x[0]==='e'?'sb-err':(x[0]==='w'?'sb-warn':'sb-ok');
@@ -298,8 +260,6 @@
     });
     draw();
   }
-  $('sb-dev').onchange=function(){$('sb-devid-wrap').style.display=this.value==='all'?'none':'';render();};
-  $('sb-focus').onchange=function(){$('sb-focusval-wrap').style.display=this.value==='Manual'?'':'none';render();};
   $('sb-add').onclick=function(){rows.appendChild(mkRow({n:'New',t:0,T:20,r:0,b:0,w:0,d:''}));render();};
   $('sb-sort').onclick=function(){var p=points().map(function(q){return {n:q.name,t:q.traw,T:q.T,r:q.r,b:q.b,w:q.w,d:q.desc};});p.sort(function(a,b){return parseFloat(a.t)-parseFloat(b.t);});setPoints(p);render();};
   Array.prototype.forEach.call(document.querySelectorAll('[data-preset]'),function(btn){

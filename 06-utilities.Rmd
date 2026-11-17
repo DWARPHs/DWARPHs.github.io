@@ -4,9 +4,11 @@ Tools that help with DWARPH, in your browser. Nothing you type in them is sent a
 
 ## Schedule builder {#schedule-builder}
 
-This page is a tool, not a description of one. Fill in the form and it writes the schedule file for you, checking as you go for the mistakes that cost people an experiment --- a temperature the hardware will refuse, a light level outside the allowed range, two setpoints at the same time, a device ID that will make the firmware reject the file.
+This page is a tool, not a description of one. Fill in the form and it writes the schedule file (`schedule.json`) for you, checking as you go for the mistakes that cost people an experiment --- a temperature the hardware will refuse, a light level outside the allowed range, two setpoints at the same time, a setpoint the cycle never reaches.
 
-Everything happens in your browser. Nothing is uploaded anywhere, and the Wi-Fi password you type stays on your machine.
+A schedule is only the experiment: temperature and light over time, the picture interval and how long the run lasts. The device's own set-up --- its Wi-Fi network, its focus and its light calibration --- is in its other file, `config.json`, which the device writes itself ([Settings on the SD card](device.html#sd-files)); there is no builder for it. So the same schedule can run on any number of devices, and it holds no passwords.
+
+Everything happens in your browser. Nothing is uploaded anywhere.
 
 Start from one of the four presets and change the numbers, or build a cycle from scratch. The graph shows what the chamber will actually do, which is usually enough to catch a schedule that does not mean what you thought it meant.
 
@@ -18,13 +20,8 @@ cat("```{=html}", readLines("assets/schedule-builder.html"), "```", sep = "\n")
 
 ### What to do with the file {-}
 
-Save it as `schedule.json` and put it on the device's SD card, inside a folder named after the device: `<DEVICE_ID>/schedule.json`. If the device is already on the network, you can skip the card and use **Upload Schedule** in the dashboard's Actions tab instead.
+Save it as `schedule.json` and put it on the device's SD card, inside the folder named after the device, replacing the one there: `<DEVICE_ID>/schedule.json` ([Settings on the SD card](device.html#sd-files)). If the device is already on the network, you can skip the card and use **Upload Schedule** in the Commander's Actions tab instead. To run the same experiment on several devices, put the same file in each device's folder.
 
 Uploading a schedule does not interrupt a run already in progress --- reset the scheduler from the Actions tab to pick up the new file.
 
-Two things the form deliberately allows, because they are sometimes what you want:
-
-* **A "Runs on: any device" schedule.** Convenient for a fleet running one treatment, but it also means the file will be accepted by any chamber you drop it on, including one running something else. Use a specific device ID when chambers differ.
-* **Setpoints that fall outside the cycle length.** These are flagged, not blocked, since you may be mid-edit --- but a setpoint after the end of the cycle is never reached.
-
-A note on the Wi-Fi password: it is stored in the schedule file as plain text, and it travels with the file. Bear that in mind before committing a schedule to a public repository or emailing it around; if the network password is sensitive, use a dedicated network for the devices.
+One thing the form deliberately allows, because it is sometimes what you want: **setpoints that fall outside the cycle length.** These are flagged, not blocked, since you may be mid-edit --- but a setpoint after the end of the cycle is never reached.

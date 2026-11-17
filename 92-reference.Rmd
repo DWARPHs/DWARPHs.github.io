@@ -2,40 +2,55 @@
 
 This appendix is the formal reference for the schedule file format and the two network interfaces a device exposes. Appendix \@ref(manual) covers the same ground in practical terms; if you are running an experiment rather than writing software against the platform, start there.
 
-## Schedule file format {#schedule-format}
+## Settings files {#schedule-format}
 
-A schedule is a JSON document with a single `scheduleConfig` object, which carries the run-wide configuration and a `schedule` array of setpoints.
+A device's settings are two JSON files in its folder on the SD card, `/sdcard/<DEVICE_ID>/`
+([Settings on the SD card](device.html#sd-files)): `config.json` for the device and `schedule.json` for the experiment. The
+device keeps a copy of both in flash. *(These two files come with the firmware on the `dwarph-qc`
+branch; earlier firmware uses one `schedule.json` with a `scheduleConfig` object holding all the
+fields below, which the new firmware converts.)*
 
-### `scheduleConfig` fields {-}
+### `config.json` {-}
 
 ```{r, echo=FALSE}
 df <- tibble::tribble(
   ~Field, ~Required, ~Value,
-  "`deviceID`", "yes", "The device's MAC suffix (case-sensitive), or `\"all\"` (case-insensitive) to allow any device. A schedule whose `deviceID` matches neither is **rejected on load**. See Section \\@ref(device-id).",
+  "`configVersion`", "no", "Format version, currently 1. A newer version than the firmware knows is refused.",
+  "`deviceID`", "yes", "The device's ID (its MAC suffix, Section \\@ref(device-id)); case-insensitive. A config for another device is **not used and not overwritten**: the device reports it, joins the Wi-Fi network in its `network` section and runs nothing else.",
+  "`network.wifiSSID`, `network.wifiPassword`", "yes", "Network the device joins at boot (empty: the firmware's built-in network).",
+  "`network.mqttBrokerUri`", "no", "Enables telemetry, e.g. `mqtt://192.168.1.50:1883`.",
+  "`network.mqttUsername`, `network.mqttPassword`", "no", "Broker credentials.",
+  "`network.mqttTopicPrefix`", "no", "Defaults to `dwraph/v1/devices` --- see Section \\@ref(mqtt).",
+  "`calibration.camera.focusMode`", "no", "`\"Auto\"` or `\"Manual\"` (case-insensitive). QC sets `Manual`.",
+  "`calibration.camera.focusValue`", "if manual", "Fixed focus position, integer 0 (far) to 255 (close); set in QC.",
+  "`calibration.camera.gain`, `exposure`", "no", "Manual gain and exposure.",
+  "`calibration.camera.captureLight`", "no", "The light each picture is taken under: `red`, `blue`, `white` (0--1) and `useForcedWhite`; by default white at 10 %. Set in the Commander's camera tuning window; recorded in every picture's metadata (`light.captured`).",
+  "`calibration.camera.sharpness`, `denoise`, `contrast`, `saturation`, `brightness`", "no", "Image processing in the camera.",
+  "`calibration.light.red`, `blue`, `white`", "no", "The measured light tables (256 numbers each) of a light calibration; colours left out use the built-in tables. With `note` and `updatedUtcUs`."
+)
+knitr::kable(df)
+```
+
+### `schedule.json` {-}
+
+```{r, echo=FALSE}
+df <- tibble::tribble(
+  ~Field, ~Required, ~Value,
   "`scheduleName`", "yes", "Free-text label identifying the schedule.",
   "`interpolation`", "yes", "`\"linear\"`, `\"step\"` (instant changes) or `\"cubic\"` (Hermite spline).",
   "`timeType`", "yes", "`\"relative\"` (time since device start) or `\"absolute\"` (**UTC**, formatted `YYYY_MM_DD HH_mm_SS`).",
   "`timeUnit`", "yes", "`\"hours\"`, `\"minutes\"` or `\"seconds\"`. Ignored for absolute time.",
   "`startTime`", "relative only", "When the schedule starts, in `timeUnit`.",
-  "`wifiSSID`", "yes", "Network the device joins at boot.",
-  "`wifiPassword`", "yes", "Password for that network.",
   "`imageIntervalMin`", "yes", "Minutes between captures; must be greater than 0.",
   "`loopTime`", "relative only", "Length of one cycle, in `timeUnit`.",
   "`totalLoops`", "yes", "Number of repeats; `-1` repeats forever. For absolute schedules, any value other than 1 causes the date part to be ignored and the schedule treated as a 24-hour loop.",
-  "`focusMode`", "no", "`\"Auto\"` (default) or `\"Manual\"`. Case-insensitive.",
-  "`focusValue`", "if manual", "Fixed focus position, integer 0 (far) to 255 (close).",
-  "`mqttBrokerUri`", "no", "Enables telemetry, e.g. `mqtt://192.168.1.50:1883`.",
-  "`mqttUsername`", "no", "Broker username.",
-  "`mqttPassword`", "no", "Broker password.",
-  "`mqttTopicPrefix`", "no", "Defaults to `dwraph/v1/devices` — see Section \\@ref(mqtt)."
+  "`schedule`", "yes", "The setpoints (below); at least one.",
+  "`firstStartTimeUtcUs`", "written by the device", "When the run started. A new `schedule.json` without it starts a new run."
 )
 knitr::kable(df)
 ```
 
-The **capture light** (the light each picture is taken under) is not a schedule field: it is a
-per-device camera setting (`captureLight` in `/api/camera/settings`: red, blue and white levels),
-by default white at 10 %, and is set in the Commander's camera tuning window. It is recorded in
-every picture's metadata (`light.captured`).
+A schedule has no `deviceID`: any device runs it.
 
 ### Setpoint fields {-}
 
@@ -51,11 +66,9 @@ df <- tibble::tribble(
 knitr::kable(df)
 ```
 
-The file belongs at `/sdcard/<DEVICE_ID>/schedule.json` on the device's SD card.
-
 ## Device identity {#identity}
 
-A device's ID is derived at boot from its factory MAC address: the last six hexadecimal digits, upper case. It is not configurable, and the `deviceID` field of a schedule is a match condition rather than an assignment.
+A device's ID is derived at boot from its factory MAC address: the last six hexadecimal digits, upper case. It is not configurable, and the `deviceID` field of `config.json` is a match condition rather than an assignment.
 
 The ID propagates to:
 
@@ -98,7 +111,7 @@ knitr::kable(df)
 
 MQTT is optional. Without a broker configured, a device is still fully controllable over REST; what you lose is the once-per-second live update that drives the dashboard cards.
 
-It is enabled per device through the optional `mqtt*` fields in `scheduleConfig` (see Section \@ref(schedule-format)). Each device then publishes on:
+It is enabled per device through the optional `mqtt*` fields in the `network` section of `config.json` (see Section \@ref(schedule-format)). Each device then publishes on:
 
 ```{r, echo=FALSE}
 df <- tibble::tribble(

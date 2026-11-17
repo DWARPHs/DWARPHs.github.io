@@ -43,8 +43,8 @@ To set it up:
    internet time servers (NTP). Without internet, a device's clock runs on from its last
    correction, kept by its battery; make sure each device has had internet access at least once
    before an experiment.
-2. Put that network's name and password in each device's schedule (`wifiSSID` and
-   `wifiPassword`; the schedule builder in Section \@ref(schedule-builder) has the fields). The
+2. Put that network's name and password in each device's `config.json` on its SD card
+   (`wifiSSID` and `wifiPassword` under `network`, [Settings on the SD card](device.html#sd-files)). The
    device joins it when it starts. If they are wrong, the device never appears: check its display,
    or connect it by USB.
 3. Connect the Commander computer to the same router.

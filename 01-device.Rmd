@@ -77,8 +77,40 @@ project for the ESP32-S3. Its main parts:
   are UTC.
 * **QC** --- the check of a new device (Section \@ref(qc)).
 
-A device takes its settings (Wi-Fi network, picture interval, broker) from its schedule, so the
-same firmware is flashed on every device.
+The same firmware is flashed on every device; each device's own settings are in two files on its
+SD card (next section).
+
+### Settings on the SD card {- #sd-files}
+
+The SD card holds a folder named after the device, `<DEVICE_ID>/` (Section \@ref(device-id)), with
+the pictures in one folder per day, the logs, and the device's two settings files. Both are plain
+text (JSON): you can open and edit them on a computer.
+
+* **`config.json`: the device.** Its ID, its network settings (`network`: the Wi-Fi network and
+  password, and the MQTT broker) and its calibration (`calibration`: the camera's focus, exposure and
+  capture light; the measured light tables). It belongs to that one device: its `deviceID` must match.
+  The device writes it itself, at its first start and when QC, the Commander's camera tuning or a
+  light calibration change something. You edit it by hand mainly to set the Wi-Fi network: change
+  `wifiSSID` and `wifiPassword` under `network`, and leave the rest as it is.
+* **`schedule.json`: the experiment.** Temperature and light over time, the picture interval, how
+  long the run lasts (Appendix \@ref(schedules)). It is not tied to a device: the same file can run
+  on any number of devices. Make one with the schedule builder (Section \@ref(schedule-builder)) and
+  replace the file on the card, or upload it from the Commander, to start a new experiment. It holds
+  no passwords, so it can be shared freely.
+
+The device keeps a copy of both in its memory: if a file is missing from the card, the device uses
+its copy and writes the file back. If a file is not valid, the device does not use it (and does not
+overwrite it), shows the error, and waits for a correct one, still reachable on the network.
+
+**If SD cards get swapped** between devices, the card holds the other device's folder and
+`config.json`, and none for this device. The device notices: it reports "SD card holds the config of
+<other ID>", joins the Wi-Fi network named in that config, and runs nothing else. Put the card back
+in its own device. *(What to do when that is not possible will be described here.)*
+
+> These two files come with the firmware on the
+> [`dwarph-qc`](https://github.com/DWARPHs/DWARPH-firmware/tree/dwarph-qc) branch (the next
+> release). Earlier firmware uses a single `schedule.json` holding everything; the new firmware
+> reads such a file and splits it into the two files by itself.
 
 ### How to flash {- #flash}
 
