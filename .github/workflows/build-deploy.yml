@@ -51,6 +51,15 @@ jobs:
           pip install gitbuilding==0.14.9
           cd build-guide && gitbuilding build-html
           cp -r _site ../_book/build
+          # page counts (analytics.html, also in header.html for the book): before </head> of each page
+          python - <<'PY'
+          from pathlib import Path
+          snippet = Path("../analytics.html").read_text()
+          for page in Path("../_book/build").rglob("*.html"):
+              html = page.read_text()
+              if "goatcounter" not in html and "</head>" in html:
+                  page.write_text(html.replace("</head>", snippet + "</head>", 1))
+          PY
 
       - uses: actions/upload-pages-artifact@v3
         with:
